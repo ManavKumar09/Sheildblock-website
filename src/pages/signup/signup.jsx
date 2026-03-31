@@ -25,13 +25,13 @@ export default function Signup() {
     setStep(2)
   }
 
-  const handleCreate = (e) => {
-    e.preventDefault()
-    localStorage.setItem('isLoggedIn', 'true')
-    localStorage.setItem('userName', form.name)
-    localStorage.setItem('deployment', deployment)
-    navigate('/dashboard')
-  }
+ const handleCreate = (e) => {
+  e.preventDefault()
+  localStorage.setItem('isLoggedIn', 'true')
+  localStorage.setItem('userName', form.name)
+  localStorage.setItem('deployment', deployment)
+  navigate(`/onboarding?mode=${deployment === 'self' ? 'self-hosted' : 'cloud'}`)
+}
 
   const handleSignIn = (e) => {
     e.preventDefault()

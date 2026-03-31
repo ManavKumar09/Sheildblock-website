@@ -13,6 +13,12 @@ import CTA from './components/CTA/CTA'
 import Footer from './components/Footer/Footer'
 import Signup from './pages/signup/signup'
 import UserDashboard from './pages/UserDashboard/UserDashboard'
+import QueryLog from './pages/QueryLog/QueryLog'
+import Blocklists from './pages/Blocklists/Blocklists'
+import Allowlist from './pages/Allowlist/Allowlist'
+import Domains from './pages/Domains/Domains'
+import Onboarding from './pages/OnBoarding/OnBoarding'
+import Settings from './pages/Settings/Settings'
 
 function HomePage() {
   return (
@@ -42,6 +48,12 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/dashboard" element={<UserDashboard />} />
+        <Route path="/dashboard/queries" element={<QueryLog />} />
+        <Route path="/dashboard/blocklists" element={<Blocklists />} />
+        <Route path="/dashboard/allowlist" element={<Allowlist />} />
+        <Route path="/dashboard/domains" element={<Domains />} />
+        <Route path="/dashboard/settings" element={<Settings />} />
+        <Route path="/onboarding" element={<Onboarding />} />
       </Routes>
     </BrowserRouter>
   )
