@@ -1,18 +1,22 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 
 	"github.com/miekg/dns"
 )
 
-var blocklist = []string{
-	"ads.google.com.",
-	"doubleclick.net.",
+var blocklist = map[string]bool{
+	"ads.google.com.":  true,
+	"doubleclick.net.": true,
 }
 
-const upstream = "1.1.1.1:53"
+const forwardToCloudflare = "1.1.1.1:53"
 
 func normalizeDomain(name string) string {
 	n := strings.ToLower(name)
@@ -24,10 +28,14 @@ func normalizeDomain(name string) string {
 
 func isBlocked(name string) bool {
 	domain := normalizeDomain(name)
-	for _, blocked := range blocklist {
-		b := normalizeDomain(blocked)
-		suffix := "." + strings.TrimSuffix(b, ".") + "."
-		if domain == b || strings.HasSuffix(domain, suffix) {
+	if blocklist[domain] {
+		return true
+	}
+
+	labels := strings.Split(strings.TrimSuffix(domain, "."), ".")
+	for i := 1; i < len(labels); i++ {
+		parent := strings.Join(labels[i:], ".") + "."
+		if blocklist[parent] {
 			return true
 		}
 	}
@@ -72,7 +80,7 @@ func handleDNS(w dns.ResponseWriter, r *dns.Msg) {
 
 	if len(msg.Answer) == 0 {
 		log.Println("FORWARD:", r.Question)
-		resp, err := dns.Exchange(r, upstream)
+		resp, err := dns.Exchange(r, forwardToCloudflare)
 		if err != nil {
 			log.Println("UPSTREAM ERROR:", err)
 			msg.Rcode = dns.RcodeServerFailure
@@ -90,14 +98,44 @@ func handleDNS(w dns.ResponseWriter, r *dns.Msg) {
 func main() {
 	dns.HandleFunc(".", handleDNS)
 
-	server := &dns.Server{
-		Addr: ":5000",
+	udpServer := &dns.Server{
+		Addr: ":8053",
 		Net:  "udp",
 	}
+	tcpServer := &dns.Server{
+		Addr: ":8053",
+		Net:  "tcp",
+	}
 
-	log.Println("DNS server running on :5000")
-	err := server.ListenAndServe()
-	if err != nil {
+	errCh := make(chan error, 2)
+
+	go func() {
+		log.Println("DNS server listening on UDP :8053")
+		if err := udpServer.ListenAndServe(); err != nil {
+			errCh <- fmt.Errorf("udp server error: %w", err)
+		}
+	}()
+
+	go func() {
+		log.Println("DNS server listening on TCP :8053")
+		if err := tcpServer.ListenAndServe(); err != nil {
+			errCh <- fmt.Errorf("tcp server error: %w", err)
+		}
+	}()
+
+	sigCh := make(chan os.Signal, 1)
+	signal.Notify(sigCh, syscall.SIGINT, syscall.SIGTERM)
+
+	select {
+	case sig := <-sigCh:
+		log.Printf("received signal %s, shutting down", sig)
+		if err := udpServer.Shutdown(); err != nil {
+			log.Printf("udp shutdown error: %v", err)
+		}
+		if err := tcpServer.Shutdown(); err != nil {
+			log.Printf("tcp shutdown error: %v", err)
+		}
+	case err := <-errCh:
 		log.Fatal(err)
 	}
 }
