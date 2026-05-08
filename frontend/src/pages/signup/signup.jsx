@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import './Signup.css'
+import './signup.css'
 
 const perks = [
   '49% faster page loads on average',
