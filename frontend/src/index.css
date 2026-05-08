@@ -1,4 +1,6 @@
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -16,19 +18,24 @@
   --text-primary: #f0f4f1;
   --text-secondary: #8a9e8f;
   --text-muted: #4a5e50;
-  --font-display: 'Syne', sans-serif;
-  --font-body: 'DM Sans', sans-serif;
+  --font-display: 'Outfit', sans-serif;
+  --font-body: 'Inter', sans-serif;
   --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+}
 
 body {
   font-family: var(--font-body);
   background-color: var(--bg);
   color: var(--text-primary);
   line-height: 1.6;
+  letter-spacing: -0.01em;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Dot grid background */
@@ -47,9 +54,21 @@ body::before {
   z-index: 1;
 }
 
-a { text-decoration: none; color: inherit; }
-button { cursor: pointer; font-family: var(--font-body); border: none; outline: none; }
-img { max-width: 100%; }
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  font-family: var(--font-body);
+  border: none;
+  outline: none;
+}
+
+img {
+  max-width: 100%;
+}
 
 /* ── Shared Section Utilities ── */
 .section-inner {
@@ -73,15 +92,17 @@ img { max-width: 100%; }
 
 .section-heading {
   font-family: var(--font-display);
-  font-size: clamp(2rem, 4vw, 3rem);
+  font-size: clamp(2rem, 4vw, 3.5rem);
   font-weight: 800;
   line-height: 1.1;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.045em;
   color: var(--text-primary);
   margin-bottom: 1rem;
 }
 
-.green { color: var(--green); }
+.green {
+  color: var(--green);
+}
 
 .section-sub {
   color: var(--text-secondary);
