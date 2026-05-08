@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import './signup.css'
+import { useState, useEffect } from 'react'
+import { useNavigate, useSearchParams } from 'react-router-dom'
+import './Signup.css'
 
 const perks = [
   '49% faster page loads on average',
@@ -10,34 +10,85 @@ const perks = [
 
 export default function Signup() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+  const initialStep = searchParams.get('step') === '2' ? 2 : 1
   const [isSignIn, setIsSignIn] = useState(false)
-  const [step, setStep] = useState(1)
+  const [step, setStep] = useState(initialStep)
   const [showPassword, setShowPassword] = useState(false)
   const [deployment, setDeployment] = useState('self')
   const [form, setForm] = useState({ name: '', email: '', password: '' })
+  const [errorMsg, setErrorMsg] = useState('')
+  const [successMsg, setSuccessMsg] = useState('')
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
-  const handleStep1 = (e) => {
+  // Listens for the verification ping from the new tab
+  useEffect(() => {
+    if (step === 1.5) {
+      const handleStorageChange = (e) => {
+        if (e.key === 'verified_ping' || e.key === 'token') {
+          // The other tab successfully verified the email, automatically move to Deployment step!
+          setStep(2);
+        }
+      };
+
+      window.addEventListener('storage', handleStorageChange);
+      
+      return () => window.removeEventListener('storage', handleStorageChange);
+    }
+  }, [step]);
+
+  const handleStep1 = async (e) => {
     e.preventDefault()
-    setStep(2)
+    setErrorMsg('')
+    setSuccessMsg('')
+    try {
+      const response = await fetch("http://localhost:8000/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: form.name, email: form.email, password: form.password })
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.detail || "Registration failed");
+      }
+      setSuccessMsg("Account created! Please check your email to verify and continue.");
+      setStep(1.5); // New "Check your email" step
+    } catch (err) {
+      setErrorMsg(err.message);
+    }
   }
 
- const handleCreate = (e) => {
-  e.preventDefault()
-  localStorage.setItem('isLoggedIn', 'true')
-  localStorage.setItem('userName', form.name)
-  localStorage.setItem('deployment', deployment)
-  navigate(`/onboarding?mode=${deployment === 'self' ? 'self-hosted' : 'cloud'}`)
-}
-
-  const handleSignIn = (e) => {
+  const handleCreate = async (e) => {
     e.preventDefault()
-    localStorage.setItem('isLoggedIn', 'true')
-    localStorage.setItem('userName', form.email)
-    navigate('/dashboard')
+    // Since they are verified, we just save the deployment mode and go to onboarding
+    localStorage.setItem('deployment', deployment)
+    navigate(`/onboarding?mode=${deployment === 'self' ? 'self-hosted' : 'cloud'}`)
+  }
+
+  const handleSignIn = async (e) => {
+    e.preventDefault()
+    setErrorMsg('')
+    setSuccessMsg('')
+    try {
+      const response = await fetch("http://localhost:8000/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: form.email, password: form.password })
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.detail || "Login failed");
+      }
+      localStorage.setItem('isLoggedIn', 'true')
+      localStorage.setItem('userName', form.email)
+      localStorage.setItem('token', data.access_token)
+      navigate('/dashboard')
+    } catch (err) {
+      setErrorMsg(err.message);
+    }
   }
 
   return (
@@ -159,6 +210,16 @@ export default function Signup() {
                 </svg>
               </button>
             </form>
+            
+            {errorMsg && (
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', backgroundColor: 'rgba(255, 77, 79, 0.08)', border: '1px solid rgba(255, 77, 79, 0.2)', color: '#ff4d4f', padding: '12px 16px', borderRadius: '8px', marginTop: '16px', fontSize: '0.9rem', lineHeight: '1.4' }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0, marginTop: '1px' }}>
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+                  <path d="M12 8v4M12 16h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+                <span>{errorMsg}</span>
+              </div>
+            )}
 
             <p className="signup__signin">
               Already have an account?{' '}
@@ -168,6 +229,22 @@ export default function Signup() {
               By creating an account, you agree to our Terms of Service and Privacy Policy.
             </p>
           </>
+        )}
+
+        {/* ── STEP 1.5 — Check Email ── */}
+        {(!isSignIn && step === 1.5) && (
+          <div style={{ textAlign: 'center', marginTop: '40px' }}>
+            <div style={{ marginBottom: '20px' }}>
+              <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
+                <path d="M22 6C22 4.9 21.1 4 20 4H4C2.9 4 2 4.9 2 6M22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6M22 6L12 13L2 6" stroke="var(--green)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </div>
+            <h1 className="signup__heading">Check your email</h1>
+            <p className="signup__subheading" style={{ marginTop: '15px', lineHeight: '1.5' }}>
+              We've sent a verification link to <strong>{form.email}</strong>.<br/>
+              Please click the link to verify your account and continue.
+            </p>
+          </div>
         )}
 
         {/* ── STEP 2 — Deployment ── */}
@@ -313,6 +390,16 @@ export default function Signup() {
                   </button>
                 </div>
               </div>
+              
+              {errorMsg && (
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', backgroundColor: 'rgba(255, 77, 79, 0.08)', border: '1px solid rgba(255, 77, 79, 0.2)', color: '#ff4d4f', padding: '12px 16px', borderRadius: '8px', marginTop: '8px', marginBottom: '16px', fontSize: '0.9rem', lineHeight: '1.4' }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0, marginTop: '1px' }}>
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/>
+                    <path d="M12 8v4M12 16h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                  <span>{errorMsg}</span>
+                </div>
+              )}
 
               <button type="submit" className="signup__submit">
                 Sign In

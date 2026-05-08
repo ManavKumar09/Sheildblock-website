@@ -140,6 +140,10 @@ export default function Onboarding() {
     adult: false,
     social: false,
   })
+  
+  const [dnsUrl, setDnsUrl] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [errorMsg, setErrorMsg] = useState('')
 
   const progress = (step / STEPS.length) * 100
 
@@ -153,7 +157,34 @@ export default function Onboarding() {
     setFilters(prev => ({ ...prev, [id]: !prev[id] }))
   }
 
-  const goNext = () => {
+  const goNext = async () => {
+    if (isCloud && step === 2) {
+      setIsLoading(true)
+      setErrorMsg('')
+      try {
+        const response = await fetch("http://localhost:8000/api/cloud-config", {
+          method: "POST",
+          headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem('token')}` 
+          },
+          body: JSON.stringify({
+            profile_name: profileName || "My Profile",
+            filters: filters
+          })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.detail || "Failed to create config");
+        setDnsUrl(data.dns_url);
+        setStep(step + 1);
+      } catch (err) {
+        setErrorMsg(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+      return;
+    }
+
     if (step < STEPS.length) setStep(step + 1)
     else navigate('/dashboard')
   }
@@ -400,8 +431,8 @@ export default function Onboarding() {
                     </div>
                     <p className="onboard__dns-method-desc">Most secure. Works in browsers and OS settings.</p>
                     <div className="onboard__code-block">
-                      <code>https://dns.shieldblock.io/dns-query/a1b2c3</code>
-                      <button className="onboard__copy-btn" onClick={() => handleCopy('https://dns.shieldblock.io/dns-query/a1b2c3', setDohCopied)}>
+                      <code>https://{dnsUrl}/dns-query</code>
+                      <button className="onboard__copy-btn" onClick={() => handleCopy(`https://${dnsUrl}/dns-query`, setDohCopied)}>
                         {dohCopied ? (
                           <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
                             <path d="M20 6L9 17l-5-5" stroke="var(--green)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -425,8 +456,8 @@ export default function Onboarding() {
                     </div>
                     <p className="onboard__dns-method-desc">For Android Private DNS and advanced configurations.</p>
                     <div className="onboard__code-block">
-                      <code>a1b2c3.dns.shieldblock.io</code>
-                      <button className="onboard__copy-btn" onClick={() => handleCopy('a1b2c3.dns.shieldblock.io', setDotCopied)}>
+                      <code>{dnsUrl}</code>
+                      <button className="onboard__copy-btn" onClick={() => handleCopy(dnsUrl, setDotCopied)}>
                         {dotCopied ? (
                           <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
                             <path d="M20 6L9 17l-5-5" stroke="var(--green)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -812,17 +843,20 @@ export default function Onboarding() {
 
       {/* ── Bottom Nav ── */}
       <div className="onboard__nav">
+        {errorMsg && <div style={{color: '#ff4d4f', marginRight: 'auto', alignSelf: 'center'}}>{errorMsg}</div>}
         <button className="onboard__back-btn" onClick={goBack}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
             <path d="M19 12H5M11 6l-6 6 6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
           Back
         </button>
-        <button className="onboard__next-btn" onClick={goNext}>
-          {step === 5 ? 'Go to Dashboard' : 'Continue'}
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
+        <button className="onboard__next-btn" onClick={goNext} disabled={isLoading}>
+          {isLoading ? 'Creating...' : (step === 5 ? 'Go to Dashboard' : 'Continue')}
+          {!isLoading && (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          )}
         </button>
       </div>
 

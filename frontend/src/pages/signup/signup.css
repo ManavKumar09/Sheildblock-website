@@ -191,31 +191,7 @@
 
 .signup__input-wrap:focus-within {
   border-color: var(--green);
-  background: #ffffff !important;
-  color: #080c0a !important;
-  transition: all var(--transition);
-}
-
-.signup__input-wrap:focus-within .signup__input {
-  color: #080c0a !important;
-}
-
-.signup__input-wrap:focus-within .signup__eye {
-  color: #4a5e50 !important;
-}
-
-.signup__input-wrap:focus-within .signup__eye:hover {
-  color: #080c0a !important;
-}
-
-/* Autofill overrides */
-.signup__input:-webkit-autofill,
-.signup__input:-webkit-autofill:hover,
-.signup__input:-webkit-autofill:focus,
-.signup__input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 30px #ffffff inset !important;
-  -webkit-text-fill-color: #080c0a !important;
-  transition: background-color 5000s ease-in-out 0s;
+  color: var(--green);
 }
 
 .signup__input {

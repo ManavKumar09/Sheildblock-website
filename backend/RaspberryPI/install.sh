@@ -74,12 +74,27 @@ systemctl enable shieldblock
 systemctl restart shieldblock
 
 # 10. Health Check
-echo "Finalizing installation..."
-sleep 2
-if curl -s http://localhost:5000/api/status > /dev/null; then
+echo "Step [6/6]: Verifying service health..."
+
+MAX_RETRIES=5
+RETRY_COUNT=0
+STATUS_OK=false
+
+while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+    echo "Check attempt $((RETRY_COUNT + 1)) of $MAX_RETRIES..."
+    if curl -s --fail http://localhost:5000/api/status > /dev/null; then
+        STATUS_OK=true
+        break
+    fi
+    RETRY_COUNT=$((RETRY_COUNT + 1))
+    sleep 3
+done
+
+if [ "$STATUS_OK" = true ]; then
     echo -e "${GREEN}=== Installation Complete! ===${NC}"
     echo "ShieldBlock is now accessible at http://shieldblock.local"
 else
-    echo -e "${RED}Warning: Service started but health check failed.${NC}"
-    echo "Check logs with: sudo journalctl -u shieldblock"
+    echo -e "${RED}Error: ShieldBlock server failed to start.${NC}"
+    echo "Check logs with: sudo journalctl -u $SERVICE_NAME"
+    exit 1
 fi

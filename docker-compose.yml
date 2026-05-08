@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: shieldblock-db
+    environment:
+      POSTGRES_DB: shieldblock
+      POSTGRES_USER: shieldadmin
+      POSTGRES_PASSWORD: shieldpassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  valkey:
+    image: valkey/valkey:7-alpine
+    container_name: shieldblock-cache
+    ports:
+      - "6379:6379"
+    command: valkey-server --loglevel warning
+
+volumes:
+  postgres_data:

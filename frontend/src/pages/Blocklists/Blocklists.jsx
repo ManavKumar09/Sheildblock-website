@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import protobuf from 'protobufjs'
 import '../UserDashboard/UserDashboard.css'
 import './Blocklists.css'
 
@@ -62,16 +63,59 @@ export default function Blocklists() {
   const [showAddForm, setShowAddForm] = useState(false)
   const [newListName, setNewListName] = useState('')
   const [newListUrl, setNewListUrl] = useState('')
+  const [isSyncing, setIsSyncing] = useState(false)
 
-  const filteredLists = activeCategory === 'All'
-    ? lists
+  const filteredLists = activeCategory === 'All' 
+    ? lists 
     : lists.filter(l => l.category === activeCategory)
-
+    
   const activeCount = lists.filter(l => l.enabled).length
   const totalDomains = lists.filter(l => l.enabled).reduce((sum, l) => sum + l.domains, 0)
 
+  // --- Protobuf Sync Logic ---
+  const syncFilters = async (currentLists) => {
+    try {
+      setIsSyncing(true)
+      const root = await protobuf.load('/filters.proto')
+      const FilterUpdateRequest = root.lookupType('shieldblock.FilterUpdateRequest')
+
+      const payload = {
+        userId: localStorage.getItem('user_id') || 'demo-user-123',
+        filters: currentLists.map(l => ({
+          id: l.id,
+          enabled: l.enabled,
+          name: l.name
+        }))
+      }
+
+      // Verify the payload
+      const errMsg = FilterUpdateRequest.verify(payload)
+      if (errMsg) throw Error(errMsg)
+
+      // Create a message and encode to binary
+      const message = FilterUpdateRequest.create(payload)
+      const buffer = FilterUpdateRequest.encode(message).finish()
+
+      // Send binary to backend
+      const response = await fetch('http://localhost:5000/api/filters/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/octet-stream' },
+        body: buffer
+      })
+
+      if (!response.ok) throw new Error('Sync failed')
+      console.log('Filters synced successfully via binary transmission')
+    } catch (err) {
+      console.error('Protobuf sync error:', err)
+    } finally {
+      setIsSyncing(false)
+    }
+  }
+
   const toggleList = (id) => {
-    setLists(prev => prev.map(l => l.id === id ? { ...l, enabled: !l.enabled } : l))
+    const nextLists = lists.map(l => l.id === id ? { ...l, enabled: !l.enabled } : l)
+    setLists(nextLists)
+    syncFilters(nextLists)
   }
 
   const handleAddList = () => {
@@ -141,7 +185,7 @@ export default function Blocklists() {
         <header className="udash__topbar">
           <div className="udash__status">
             <span className="udash__status-dot" />
-            Filtering active
+            {isSyncing ? 'Syncing...' : 'Filtering active'}
           </div>
           <div className="udash__topbar-right">
             <button className="udash__icon-btn">
