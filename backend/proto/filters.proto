@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package shieldblock;
+
+// Status of a single filter list
+message FilterStatus {
+  int32 id = 1;
+  bool enabled = 2;
+  string name = 3;
+}
+
+// Request to update multiple filters
+message FilterUpdateRequest {
+  string user_id = 1;
+  repeated FilterStatus filters = 2;
+}
+
+// Backend response
+message FilterResponse {
+  bool success = 1;
+  string message = 2;
+  string user_id = 3;
+}

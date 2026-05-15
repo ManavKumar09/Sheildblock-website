@@ -1,0 +1,349 @@
+/* ── Blocklists Page ── */
+
+.bl__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.bl__title {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.03em;
+}
+
+.bl__subtitle {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.bl__header-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.bl__action-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0.55rem 1.1rem;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: none;
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.bl__action-btn:hover {
+  border-color: var(--border);
+  color: var(--text-primary);
+  background: var(--green-dim);
+}
+
+.bl__action-btn--primary {
+  background: var(--green);
+  color: #080c0a;
+  font-weight: 700;
+  border-color: var(--green);
+}
+
+.bl__action-btn--primary:hover {
+  background: var(--green-dark);
+  border-color: var(--green-dark);
+  color: #080c0a;
+}
+
+/* Category Tabs */
+.bl__tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+/* Add Custom Blocklist Form */
+.bl__add-form {
+  background: var(--bg-card);
+  border: 1.5px solid var(--green);
+  border-radius: 14px;
+  padding: 1.1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  animation: formSlideIn 0.25s ease both;
+}
+
+@keyframes formSlideIn {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.bl__add-form-title {
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.bl__add-form-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.bl__add-form-input {
+  padding: 0.6rem 0.9rem;
+  border-radius: 9px;
+  border: 1px solid var(--border-subtle);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-family: var(--font-body);
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+.bl__add-form-input:focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(0, 230, 118, 0.08);
+}
+
+.bl__add-form-input::placeholder {
+  color: var(--text-muted);
+}
+
+.bl__add-form-input--name {
+  width: 180px;
+  flex-shrink: 0;
+}
+
+.bl__add-form-input--url {
+  flex: 1;
+  min-width: 0;
+}
+
+.bl__add-form-submit {
+  padding: 0.6rem 1.3rem;
+  border-radius: 9px;
+  background: var(--green);
+  color: #080c0a;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--transition);
+}
+
+.bl__add-form-submit:hover {
+  background: var(--green-dark);
+}
+
+.bl__tab {
+  padding: 0.45rem 1rem;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+
+.bl__tab:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.bl__tab--active {
+  background: var(--green);
+  color: #080c0a;
+  font-weight: 700;
+  border-color: var(--green);
+}
+
+.bl__tab--active:hover {
+  background: var(--green-dark);
+  color: #080c0a;
+}
+
+/* Blocklist Items */
+.bl__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.bl__item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.1rem 1.25rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  margin-bottom: -1px;
+  transition: all var(--transition);
+}
+
+.bl__item:first-child {
+  border-radius: 14px 14px 0 0;
+}
+
+.bl__item:last-child {
+  border-radius: 0 0 14px 14px;
+  margin-bottom: 0;
+}
+
+.bl__item:only-child {
+  border-radius: 14px;
+}
+
+.bl__item:hover {
+  background: rgba(0, 230, 118, 0.02);
+}
+
+/* Toggle Switch */
+.bl__toggle {
+  width: 44px;
+  height: 24px;
+  border-radius: 100px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  cursor: pointer;
+  position: relative;
+  flex-shrink: 0;
+  transition: background var(--transition);
+}
+
+.bl__toggle--on {
+  background: var(--green);
+}
+
+.bl__toggle-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform var(--transition);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.bl__toggle--on .bl__toggle-knob {
+  transform: translateX(20px);
+}
+
+/* Item Info */
+.bl__item-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.bl__item-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bl__item-name {
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: var(--text-primary);
+}
+
+.bl__item-cat {
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 0.15rem 0.55rem;
+  border-radius: 5px;
+  text-transform: capitalize;
+}
+
+.bl__item-cat--ads {
+  background: rgba(0, 230, 118, 0.12);
+  color: var(--green);
+  border: 1px solid rgba(0, 230, 118, 0.2);
+}
+
+.bl__item-cat--trackers {
+  background: rgba(38, 198, 218, 0.12);
+  color: #26c6da;
+  border: 1px solid rgba(38, 198, 218, 0.2);
+}
+
+.bl__item-cat--malware {
+  background: rgba(255, 152, 0, 0.12);
+  color: #ff9800;
+  border: 1px solid rgba(255, 152, 0, 0.2);
+}
+
+.bl__item-cat--phishing {
+  background: rgba(171, 71, 188, 0.12);
+  color: #ab47bc;
+  border: 1px solid rgba(171, 71, 188, 0.2);
+}
+
+.bl__item-cat--social {
+  background: rgba(239, 83, 80, 0.12);
+  color: #ef5350;
+  border: 1px solid rgba(239, 83, 80, 0.2);
+}
+
+.bl__item-cat--multi {
+  background: rgba(255, 213, 79, 0.12);
+  color: #ffd54f;
+  border: 1px solid rgba(255, 213, 79, 0.2);
+}
+
+.bl__item-meta {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* External link button */
+.bl__item-link {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition);
+  flex-shrink: 0;
+}
+
+.bl__item-link:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+  .bl__header {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .bl__tabs {
+    gap: 4px;
+  }
+  .bl__item {
+    padding: 0.9rem 1rem;
+  }
+}

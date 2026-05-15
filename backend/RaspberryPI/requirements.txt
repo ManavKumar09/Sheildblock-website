@@ -1,0 +1,7 @@
+flask
+flask-cors
+valkey
+psycopg2-binary
+grpcio
+grpcio-tools
+protobuf

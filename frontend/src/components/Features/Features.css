@@ -1,0 +1,121 @@
+.features {
+  padding: 100px 2rem;
+}
+
+.features__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Header */
+.features__header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+/* Rows */
+.features__row {
+  display: grid;
+  gap: 1rem;
+}
+
+.features__row--2col {
+  grid-template-columns: 1fr 1fr;
+}
+
+.features__row--3col {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.features__row--solo {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.features__row--solo .feature-card {
+  grid-column: 1;
+}
+
+/* Card */
+.feature-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transition: border-color var(--transition), transform var(--transition);
+}
+
+.feature-card:hover {
+  border-color: var(--border);
+  transform: translateY(-2px);
+}
+
+/* Top row: icon + tag */
+.feature-card__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.feature-card__icon {
+  width: 44px;
+  height: 44px;
+  background: var(--green-dim);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--green);
+  flex-shrink: 0;
+}
+
+.feature-card__tag {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 0.25rem 0.6rem;
+  text-transform: uppercase;
+}
+
+/* Title */
+.feature-card__title {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+/* Desc */
+.feature-card__desc {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .features__row--3col {
+    grid-template-columns: 1fr 1fr;
+  }
+  .features__row--solo {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .features__row--2col,
+  .features__row--3col,
+  .features__row--solo {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,109 @@
+.howitworks {
+  padding: 100px 2rem;
+}
+
+.howitworks__inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 3.5rem;
+}
+
+/* Header */
+.howitworks__header {
+  text-align: center;
+}
+
+/* Grid */
+.howitworks__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+/* Card */
+.hiw-card {
+  padding: 2rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  background: var(--bg-card);
+  border-right: 1px solid var(--border-subtle);
+  transition: background var(--transition);
+  position: relative;
+}
+
+.hiw-card:last-child {
+  border-right: none;
+}
+
+.hiw-card:hover {
+  background: rgba(0, 230, 118, 0.04);
+}
+
+/* Step number */
+.hiw-card__num {
+  font-family: var(--font-display);
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: rgba(0, 230, 118, 0.15);
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+/* Icon */
+.hiw-card__icon {
+  width: 48px;
+  height: 48px;
+  background: var(--green-dim);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--green);
+}
+
+/* Title */
+.hiw-card__title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+/* Desc */
+.hiw-card__desc {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.75;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .howitworks__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .hiw-card:nth-child(2) { border-right: none; }
+  .hiw-card:nth-child(1),
+  .hiw-card:nth-child(2) {
+    border-bottom: 1px solid var(--border-subtle);
+  }
+}
+
+@media (max-width: 560px) {
+  .howitworks__grid {
+    grid-template-columns: 1fr;
+  }
+  .hiw-card {
+    border-right: none;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .hiw-card:last-child {
+    border-bottom: none;
+  }
+}

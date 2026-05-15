@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+sqlalchemy
+pydantic
+pydantic-settings
+email-validator
+bcrypt
+python-jose[cryptography]
+fastapi-mail
+python-dotenv
+slowapi
