@@ -27,3 +27,4 @@ dist-ssr
 *.pdf
 .env
 *_pycache__
+*.db

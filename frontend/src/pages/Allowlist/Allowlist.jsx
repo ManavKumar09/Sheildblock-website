@@ -52,6 +52,11 @@ const navItems = [
 export default function Allowlist() {
   const navigate = useNavigate()
   const [entries, setEntries] = useState(initialEntries)
+<<<<<<< HEAD
+=======
+  const [newDomain, setNewDomain] = useState('')
+  const [newReason, setNewReason] = useState('')
+>>>>>>> 785ef3bd7a628e55569532b5be494abf5dc75fd9
   const [search, setSearch] = useState('')
 
   const filteredEntries = entries.filter(e =>
@@ -59,6 +64,22 @@ export default function Allowlist() {
     e.reason.toLowerCase().includes(search.toLowerCase())
   )
 
+<<<<<<< HEAD
+=======
+  const handleAdd = () => {
+    if (!newDomain.trim()) return
+    const entry = {
+      id: Date.now(),
+      domain: newDomain.trim(),
+      reason: newReason.trim() || '',
+      added: 'just now',
+    }
+    setEntries(prev => [entry, ...prev])
+    setNewDomain('')
+    setNewReason('')
+  }
+
+>>>>>>> 785ef3bd7a628e55569532b5be494abf5dc75fd9
   const handleDelete = (id) => {
     setEntries(prev => prev.filter(e => e.id !== id))
   }
@@ -136,13 +157,50 @@ export default function Allowlist() {
         <div className="udash__content">
 
           {/* Page header */}
+<<<<<<< HEAD
           <div className="al__page-header" style={{ marginBottom: '1.5rem' }}>
+=======
+          <div className="al__page-header">
+>>>>>>> 785ef3bd7a628e55569532b5be494abf5dc75fd9
             <h1 className="al__title">Allowlist</h1>
             <p className="al__subtitle">
               Domains on this list will never be blocked, even if they appear in a blocklist. {entries.length} entries.
             </p>
           </div>
 
+<<<<<<< HEAD
+=======
+          {/* Add domain form */}
+          <div className="al__add-form">
+            <h3 className="al__add-form-title">Add domain to allowlist</h3>
+            <div className="al__add-form-row">
+              <input
+                type="text"
+                className="al__add-form-input al__add-form-input--domain"
+                placeholder="domain.com"
+                value={newDomain}
+                onChange={(e) => setNewDomain(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
+              />
+              <input
+                type="text"
+                className="al__add-form-input al__add-form-input--reason"
+                placeholder="Reason (optional)"
+                value={newReason}
+                onChange={(e) => setNewReason(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
+              />
+              <button className="al__add-form-submit" onClick={handleAdd}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
+                  <line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/>
+                  <line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/>
+                </svg>
+                Add
+              </button>
+            </div>
+          </div>
+
+>>>>>>> 785ef3bd7a628e55569532b5be494abf5dc75fd9
           {/* Search */}
           <div className="al__search">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -185,4 +243,8 @@ export default function Allowlist() {
       </div>
     </div>
   )
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 785ef3bd7a628e55569532b5be494abf5dc75fd9
