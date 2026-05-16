@@ -1,4 +1,5 @@
 import bcrypt
+import time
 from sqlalchemy.orm import Session
 from models import User
 from schemas import UserCreate
@@ -26,8 +27,18 @@ def create_user(db: Session, user: UserCreate):
         hashed_password=hashed_password
     )
     db.add(db_user)
+
+    commit_start = time.perf_counter()
     db.commit()
+    commit_duration = time.perf_counter() - commit_start
+
+    refresh_start = time.perf_counter()
     db.refresh(db_user)
+    refresh_duration = time.perf_counter() - refresh_start
+
+    print(
+        f"[CREATE_USER] commit={commit_duration*1000:.2f}ms, refresh={refresh_duration*1000:.2f}ms"
+    )
     return db_user
 
 def verify_user(db: Session, email: str):
