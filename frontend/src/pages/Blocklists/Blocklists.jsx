@@ -192,6 +192,7 @@ export default function Blocklists() {
                 Manage your DNS blocklist subscriptions. {activeCount} active, {totalDomains.toLocaleString()} domains.
               </p>
             </div>
+<<<<<<< HEAD
             <div className="bl__header-actions">
               <button className="bl__action-btn">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
@@ -208,6 +209,21 @@ export default function Blocklists() {
                 Add List
               </button>
             </div>
+=======
+            
+            {/* UPDATED HEADER ACTIONS */}
+            <div className="bl__header-actions">
+              <button className="bl__action-btn bl__action-btn--primary">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <polyline points="23 4 23 10 17 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                Update All
+              </button>
+            </div>
+            {/* END UPDATED HEADER ACTIONS */}
+
+>>>>>>> 1913ed0f29605d1197ad2682b297afcda2bb2bfa
           </div>
 
           {/* Add Custom Blocklist Form */}

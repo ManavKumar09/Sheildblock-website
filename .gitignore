@@ -28,3 +28,4 @@ dist-ssr
 .env
 *_pycache__
 *.db
+docs/*
