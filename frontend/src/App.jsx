@@ -20,6 +20,7 @@ import Domains from './pages/Domains/Domains'
 import Onboarding from './pages/OnBoarding/OnBoarding'
 import Settings from './pages/Settings/Settings'
 import Verify from './pages/Verify/Verify'
+import DeviceGuide from './pages/OnBoarding/DeviceGuide'
 
 function HomePage() {
   return (
@@ -55,6 +56,7 @@ function App() {
         <Route path="/dashboard/domains" element={<Domains />} />
         <Route path="/dashboard/settings" element={<Settings />} />
         <Route path="/onboarding" element={<Onboarding />} />
+        <Route path="/onboarding/guide/:deviceName" element={<DeviceGuide />} />
         <Route path="/verify" element={<Verify />} />
       </Routes>
     </BrowserRouter>

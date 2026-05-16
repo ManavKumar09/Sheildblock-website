@@ -196,22 +196,26 @@
   color: var(--text-muted);
 }
 
-.signup__input-wrap:focus-within {
+.signup__input-wrap:focus-within,
+.signup__input-wrap:has(input:-webkit-autofill) {
   border-color: var(--green);
   background: #ffffff !important;
   color: #080c0a !important;
   transition: all var(--transition);
 }
 
-.signup__input-wrap:focus-within .signup__input {
+.signup__input-wrap:focus-within .signup__input,
+.signup__input-wrap:has(input:-webkit-autofill) .signup__input {
   color: #080c0a !important;
 }
 
-.signup__input-wrap:focus-within .signup__eye {
+.signup__input-wrap:focus-within .signup__eye,
+.signup__input-wrap:has(input:-webkit-autofill) .signup__eye {
   color: #4a5e50 !important;
 }
 
-.signup__input-wrap:focus-within .signup__eye:hover {
+.signup__input-wrap:focus-within .signup__eye:hover,
+.signup__input-wrap:has(input:-webkit-autofill) .signup__eye:hover {
   color: #080c0a !important;
 }
 

@@ -284,6 +284,19 @@
   box-shadow: 0 0 16px rgba(255, 80, 80, 0.12);
 }
 
+.st__action-btn--report-danger {
+  background: rgba(255, 171, 0, 0.1);
+  border-color: rgba(255, 171, 0, 0.2);
+  color: #ffab00;
+}
+
+.st__action-btn--report-danger:hover {
+  background: rgba(255, 171, 0, 0.2);
+  border-color: rgba(255, 171, 0, 0.35);
+  color: #ffab00;
+  box-shadow: 0 0 16px rgba(255, 171, 0, 0.12);
+}
+
 /* ── Animations ── */
 .st__section {
   animation: stFadeIn 0.4s ease both;

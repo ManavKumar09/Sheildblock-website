@@ -1,0 +1,37 @@
+.udash__icon-btn--report {
+  width: auto !important;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 18px;
+  background: rgba(255, 71, 87, 0.1);
+  border: 1px solid rgba(255, 71, 87, 0.3);
+  color: #ff4757 !important;
+  border-radius: 9px;
+  height: 36px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 15px rgba(255, 71, 87, 0.05);
+}
+
+.udash__icon-btn--report:hover {
+  background: #ff4757;
+  border-color: #ff4757;
+  color: #fff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 71, 87, 0.4);
+}
+
+.udash__icon-btn--report svg {
+  transition: transform 0.3s ease;
+}
+
+.udash__icon-btn--report:hover svg {
+  transform: scale(1.1) rotate(-5deg);
+}
+
+.udash__icon-btn-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}

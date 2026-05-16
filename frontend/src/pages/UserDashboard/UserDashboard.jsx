@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import DashboardTopBar from '../../components/DashboardTopBar/DashboardTopBar'
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell,
@@ -102,6 +103,8 @@ export default function UserDashboard() {
   const navigate = useNavigate()
   const [activeNav, setActiveNav] = useState('overview')
   const [queries, setQueries] = useState(initialQueries)
+  const logRetention = localStorage.getItem('logRetention') || '7'
+  const [chartDays, setChartDays] = useState(logRetention)
   let qIndex = 0
 
   useEffect(() => {
@@ -183,27 +186,7 @@ export default function UserDashboard() {
       <div className="udash__main">
 
         {/* Top bar */}
-        <header className="udash__topbar">
-          <div className="udash__status">
-            <span className="udash__status-dot" />
-            Filtering active
-          </div>
-          <div className="udash__topbar-right">
-            <button className="udash__icon-btn">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-              </svg>
-            </button>
-            <button className="udash__icon-btn" onClick={handleLogout}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                <polyline points="16 17 21 12 16 7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                <line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-              </svg>
-            </button>
-          </div>
-        </header>
+        <DashboardTopBar />
 
         {/* Content */}
         <div className="udash__content">
@@ -270,7 +253,16 @@ export default function UserDashboard() {
               <div className="udash__chart-header">
                 <div>
                   <h3 className="udash__chart-title">Queries over time</h3>
-                  <p className="udash__chart-sub">Last 24 hours</p>
+                  <div className="udash__chart-sub">
+                    Last <select className="udash__inline-select" value={chartDays} onChange={(e) => setChartDays(e.target.value)}>
+                      <option value="1">1 day</option>
+                      <option value="2">2 days</option>
+                      <option value="3">3 days</option>
+                      <option value="7">7 days</option>
+                      <option value="14">14 days</option>
+                      <option value="30">30 days</option>
+                    </select>
+                  </div>
                 </div>
                 <div className="udash__chart-legend">
                   <span className="udash__legend-item">

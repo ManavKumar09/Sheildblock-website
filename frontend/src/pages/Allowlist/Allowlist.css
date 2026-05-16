@@ -106,6 +106,14 @@
 
 .al__search:focus-within {
   border-color: var(--green);
+  background: #ffffff !important;
+  color: #080c0a !important;
+  border-radius: 10px;
+  margin-bottom: 5px;
+}
+
+.al__search:focus-within .al__search-input {
+  color: #080c0a !important;
 }
 
 .al__search svg {

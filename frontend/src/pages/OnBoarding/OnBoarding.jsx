@@ -125,7 +125,8 @@ export default function Onboarding() {
 
   const STEPS = isCloud ? CLOUD_STEPS : SELF_STEPS
 
-  const [step, setStep] = useState(1)
+  const initialStep = parseInt(searchParams.get('step')) || 1
+  const [step, setStep] = useState(initialStep)
   const [copied, setCopied] = useState(false)
   const [dnsCopied, setDnsCopied] = useState(false)
   const [dohCopied, setDohCopied] = useState(false)
@@ -141,7 +142,7 @@ export default function Onboarding() {
     social: false,
   })
   
-  const [dnsUrl, setDnsUrl] = useState('')
+  const [dnsUrl, setDnsUrl] = useState('dns.shieldblock.org/dummy-profile')
   const [isLoading, setIsLoading] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
 
@@ -161,6 +162,7 @@ export default function Onboarding() {
     if (isCloud && step === 2) {
       setIsLoading(true)
       setErrorMsg('')
+      /*
       try {
         const response = await fetch("http://localhost:8000/api/cloud-config", {
           method: "POST",
@@ -182,6 +184,12 @@ export default function Onboarding() {
       } finally {
         setIsLoading(false);
       }
+      */
+      setTimeout(() => {
+        setDnsUrl("dns.shieldblock.org/dummy-profile");
+        setStep(step + 1);
+        setIsLoading(false);
+      }, 1000);
       return;
     }
 
@@ -506,7 +514,12 @@ export default function Onboarding() {
                     { name: 'Linux', desc: 'Use systemd-resolved or NetworkManager' },
                     { name: 'Router', desc: 'Set as upstream DNS in router admin' },
                   ].map((d) => (
-                    <div key={d.name} className="onboard__connect-card">
+                    <div 
+                      key={d.name} 
+                      className="onboard__connect-card"
+                      onClick={() => navigate(`/onboarding/guide/${encodeURIComponent(d.name)}`)}
+                      style={{ cursor: 'pointer' }}
+                    >
                       <div>
                         <h4 className="onboard__connect-card-title">{d.name}</h4>
                         <p className="onboard__connect-card-desc">{d.desc}</p>

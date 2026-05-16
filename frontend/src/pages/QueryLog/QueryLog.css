@@ -68,7 +68,13 @@
 
 .ql__search:focus-within {
   border-color: var(--green);
+  background: #ffffff !important;
+  color: #080c0a !important;
   box-shadow: 0 0 0 3px rgba(0, 230, 118, 0.08);
+}
+
+.ql__search:focus-within .ql__search-input {
+  color: #080c0a !important;
 }
 
 .ql__search svg {

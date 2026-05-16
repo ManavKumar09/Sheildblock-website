@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import DashboardTopBar from '../../components/DashboardTopBar/DashboardTopBar'
+import ReportModal from '../../components/ReportModal/ReportModal'
 import '../UserDashboard/UserDashboard.css'
 import './Settings.css'
 
@@ -43,40 +45,34 @@ const navItems = [
 
 export default function Settings() {
   const navigate = useNavigate()
+  const [isReportOpen, setIsReportOpen] = useState(false)
 
   const [dnsFiltering, setDnsFiltering] = useState(true)
   const [dnssec, setDnssec] = useState(true)
-<<<<<<< HEAD
-=======
   const [rateLimiting, setRateLimiting] = useState(true)
   const [blockingMode, setBlockingMode] = useState('null')
   const [queryLogging, setQueryLogging] = useState(true)
->>>>>>> 785ef3bd7a628e55569532b5be494abf5dc75fd9
   const [anonymizeLogs, setAnonymizeLogs] = useState(false)
-  const [logRetention, setLogRetention] = useState('7')
+  const [logRetention, setLogRetention] = useState(localStorage.getItem('logRetention') || '7')
   const [pushNotifications, setPushNotifications] = useState(true)
   const [weeklyReport, setWeeklyReport] = useState(true)
-  const [copiedToken, setCopiedToken] = useState(false)
-  const [copiedIp, setCopiedIp] = useState(false)
+  const [copiedDoh, setCopiedDoh] = useState(false)
+  const [copiedDot, setCopiedDot] = useState(false)
 
-  const apiToken = 'sb_live_a4b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6'
-  const dnsIp = '192.168.1.100'
+  const dohLink = 'https://dns.shieldblock.org/dummy-profile/dns-query'
+  const dotLink = 'dns.shieldblock.org/dummy-profile'
 
   const copyToClipboard = (text, type) => {
     navigator.clipboard.writeText(text)
-    if (type === 'token') {
-      setCopiedToken(true)
-      setTimeout(() => setCopiedToken(false), 2000)
-    } else {
-      setCopiedIp(true)
-      setTimeout(() => setCopiedIp(false), 2000)
+    if (type === 'doh') {
+      setCopiedDoh(true)
+      setTimeout(() => setCopiedDoh(false), 2000)
+    } else if (type === 'dot') {
+      setCopiedDot(true)
+      setTimeout(() => setCopiedDot(false), 2000)
     }
   }
 
-  const handleLogout = () => {
-    localStorage.clear()
-    navigate('/')
-  }
 
   const handleNav = (id) => {
     if (id === 'overview') navigate('/dashboard')
@@ -124,28 +120,8 @@ export default function Settings() {
 
       {/* ── Main ── */}
       <div className="udash__main">
-
-        <header className="udash__topbar">
-          <div className="udash__status">
-            <span className="udash__status-dot" />
-            Filtering active
-          </div>
-          <div className="udash__topbar-right">
-            <button className="udash__icon-btn">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-              </svg>
-            </button>
-            <button className="udash__icon-btn" onClick={handleLogout}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                <polyline points="16 17 21 12 16 7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                <line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-              </svg>
-            </button>
-          </div>
-        </header>
+        {/* Top bar */}
+        <DashboardTopBar />
 
         <div className="udash__content">
 
@@ -179,8 +155,6 @@ export default function Settings() {
               </div>
               <Toggle value={dnssec} onChange={setDnssec} />
             </div>
-<<<<<<< HEAD
-=======
 
             <div className="st__row">
               <div className="st__row-info">
@@ -202,7 +176,6 @@ export default function Settings() {
                 <option value="custom">Custom IP</option>
               </select>
             </div>
->>>>>>> 785ef3bd7a628e55569532b5be494abf5dc75fd9
           </div>
 
           {/* ── Logging ── */}
@@ -219,8 +192,6 @@ export default function Settings() {
 
             <div className="st__row">
               <div className="st__row-info">
-<<<<<<< HEAD
-=======
                 <span className="st__row-label">Query Logging</span>
                 <span className="st__row-desc">Log all DNS queries for analytics and debugging.</span>
               </div>
@@ -229,7 +200,6 @@ export default function Settings() {
 
             <div className="st__row">
               <div className="st__row-info">
->>>>>>> 785ef3bd7a628e55569532b5be494abf5dc75fd9
                 <span className="st__row-label">Anonymize Logs</span>
                 <span className="st__row-desc">Mask client IP addresses in logs for additional privacy.</span>
               </div>
@@ -241,17 +211,16 @@ export default function Settings() {
                 <span className="st__row-label">Log Retention</span>
                 <span className="st__row-desc">How long to keep query logs before automatic deletion.</span>
               </div>
-              <select className="st__select" value={logRetention} onChange={(e) => setLogRetention(e.target.value)}>
+              <select className="st__select" value={logRetention} onChange={(e) => {
+                setLogRetention(e.target.value)
+                localStorage.setItem('logRetention', e.target.value)
+              }}>
                 <option value="1">1 day</option>
                 <option value="3">3 days</option>
                 <option value="7">7 days</option>
                 <option value="14">14 days</option>
                 <option value="30">30 days</option>
-<<<<<<< HEAD
-                <option value="60">60 days</option>
-=======
                 <option value="90">90 days</option>
->>>>>>> 785ef3bd7a628e55569532b5be494abf5dc75fd9
               </select>
             </div>
           </div>
@@ -269,9 +238,9 @@ export default function Settings() {
             <div className="st__row st__row--col">
               <span className="st__row-label">API Token</span>
               <div className="st__copyable">
-                <code className="st__copyable-value">{apiToken}</code>
-                <button className="st__copy-btn" onClick={() => copyToClipboard(apiToken, 'token')}>
-                  {copiedToken ? (
+                <code className="st__copyable-value">{dohLink}</code>
+                <button className="st__copy-btn" onClick={() => copyToClipboard(dohLink, 'doh')}>
+                  {copiedDoh ? (
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                       <path d="M20 6L9 17l-5-5" stroke="var(--green)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
@@ -286,11 +255,11 @@ export default function Settings() {
             </div>
 
             <div className="st__row st__row--col">
-              <span className="st__row-label">ShieldBlock DNS IP</span>
+              <span className="st__row-label">DNS-over-TLS</span>
               <div className="st__copyable">
-                <code className="st__copyable-value">{dnsIp}</code>
-                <button className="st__copy-btn" onClick={() => copyToClipboard(dnsIp, 'ip')}>
-                  {copiedIp ? (
+                <code className="st__copyable-value">{dotLink}</code>
+                <button className="st__copy-btn" onClick={() => copyToClipboard(dotLink, 'dot')}>
+                  {copiedDot ? (
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                       <path d="M20 6L9 17l-5-5" stroke="var(--green)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     </svg>
@@ -340,6 +309,20 @@ export default function Settings() {
 
             <div className="st__row">
               <div className="st__row-info">
+                <span className="st__row-label">Report Missed Ad</span>
+                <span className="st__row-desc">Found an ad that wasn't blocked? Report it to help us improve.</span>
+              </div>
+              <button className="st__action-btn st__action-btn--report-danger" onClick={() => setIsReportOpen(true)}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 2L4 5.5V11c0 4.5 3.4 8.7 8 9.9 4.6-1.2 8-5.4 8-9.9V5.5L12 2z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/>
+                  <path d="M12 8v4M12 16h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+                Report
+              </button>
+            </div>
+
+            <div className="st__row">
+              <div className="st__row-info">
                 <span className="st__row-label">Export Configuration</span>
                 <span className="st__row-desc">Download your settings and blocklists as a backup file.</span>
               </div>
@@ -355,8 +338,6 @@ export default function Settings() {
 
             <div className="st__row">
               <div className="st__row-info">
-<<<<<<< HEAD
-=======
                 <span className="st__row-label">Flush DNS Cache</span>
                 <span className="st__row-desc">Clear all cached DNS responses.</span>
               </div>
@@ -371,7 +352,6 @@ export default function Settings() {
 
             <div className="st__row">
               <div className="st__row-info">
->>>>>>> 785ef3bd7a628e55569532b5be494abf5dc75fd9
                 <span className="st__row-label st__row-label--danger">Delete All Data</span>
                 <span className="st__row-desc">Permanently delete all logs, settings, and blocklists.</span>
               </div>
@@ -387,10 +367,7 @@ export default function Settings() {
 
         </div>
       </div>
+      <ReportModal isOpen={isReportOpen} onClose={() => setIsReportOpen(false)} />
     </div>
   )
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 785ef3bd7a628e55569532b5be494abf5dc75fd9

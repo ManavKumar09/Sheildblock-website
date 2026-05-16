@@ -1,0 +1,226 @@
+.report-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 2rem 1rem;
+  overflow-y: auto;
+  animation: modalOverlayFade 0.3s ease both;
+}
+
+@keyframes modalOverlayFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.report-modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  animation: modalSlideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes modalSlideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.report-modal__header {
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-card);
+}
+
+.report-modal__icon {
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 71, 87, 0.1);
+  border: 1px solid rgba(255, 71, 87, 0.2);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.report-modal__icon svg path {
+  stroke: #ff4757 !important;
+}
+
+.report-modal__title {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.report-modal__close {
+  position: absolute;
+  right: 1.5rem;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  transition: color 0.2s;
+}
+
+.report-modal__close:hover {
+  color: var(--text-primary);
+}
+
+.report-modal__body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  flex: 1;
+}
+
+.report-modal__text {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.report-modal__time-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.report-modal__label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.report-modal__time-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.report-modal__time-btn {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  padding: 0.75rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.report-modal__time-btn:hover {
+  border-color: #ff4757;
+  color: #ff4757;
+}
+
+.report-modal__time-btn--active {
+  background: rgba(255, 71, 87, 0.1);
+  border-color: #ff4757;
+  color: #ff4757;
+  box-shadow: 0 0 15px rgba(255, 71, 87, 0.1);
+}
+
+.report-modal__custom-time {
+  margin-top: 2px;
+}
+
+.report-modal__input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  transition: all 0.2s;
+  outline: none;
+}
+
+.report-modal__input::placeholder {
+  color: var(--text-muted);
+}
+
+.report-modal__input:focus, .report-modal__input--active {
+  border-color: #ff4757;
+  box-shadow: 0 0 15px rgba(255, 71, 87, 0.1);
+}
+
+.report-modal__info-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  padding: 1rem;
+}
+
+.report-modal__info-card p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.report-modal__info-card strong {
+  color: #ff4757;
+}
+
+.report-modal__footer {
+  padding: 1.5rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  gap: 12px;
+}
+
+.report-modal__btn-cancel {
+  flex: 1;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 0.85rem;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.report-modal__btn-cancel:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.report-modal__btn-allow {
+  flex: 2;
+  background: #ff4757;
+  border: none;
+  color: #fff;
+  padding: 0.85rem;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.report-modal__btn-allow:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(255, 71, 87, 0.4);
+}

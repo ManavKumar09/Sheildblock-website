@@ -15,7 +15,7 @@ export default function Signup() {
   const [isSignIn, setIsSignIn] = useState(false)
   const [step, setStep] = useState(initialStep)
   const [showPassword, setShowPassword] = useState(false)
-  const [deployment, setDeployment] = useState('self')
+  const [deployment, setDeployment] = useState('cloud')
   const [form, setForm] = useState({ name: '', email: '', password: '' })
   const [errorMsg, setErrorMsg] = useState('')
   const [successMsg, setSuccessMsg] = useState('')
@@ -44,6 +44,7 @@ export default function Signup() {
     e.preventDefault()
     setErrorMsg('')
     setSuccessMsg('')
+    /*
     try {
       const response = await fetch("http://localhost:8000/register", {
         method: "POST",
@@ -59,6 +60,12 @@ export default function Signup() {
     } catch (err) {
       setErrorMsg(err.message);
     }
+    */
+    // Dummy signup logic: bypass backend and email verification
+    localStorage.setItem('isLoggedIn', 'true')
+    localStorage.setItem('userName', form.email)
+    localStorage.setItem('token', 'dummy-token-for-dev')
+    setStep(2)
   }
 
   const handleCreate = async (e) => {
@@ -72,6 +79,7 @@ export default function Signup() {
     e.preventDefault()
     setErrorMsg('')
     setSuccessMsg('')
+    /*
     try {
       const response = await fetch("http://localhost:8000/login", {
         method: "POST",
@@ -89,6 +97,12 @@ export default function Signup() {
     } catch (err) {
       setErrorMsg(err.message);
     }
+    */
+    // Dummy signin logic: bypass backend
+    localStorage.setItem('isLoggedIn', 'true')
+    localStorage.setItem('userName', form.email)
+    localStorage.setItem('token', 'dummy-token-for-dev')
+    navigate('/dashboard')
   }
 
   return (
@@ -258,6 +272,40 @@ export default function Signup() {
             <div className="signup__deploy-options">
 
               <div
+                className={`deploy-option ${deployment === 'cloud' ? 'deploy-option--active' : ''}`}
+                onClick={() => setDeployment('cloud')}
+              >
+                <div className="deploy-option__left">
+                  <div className="deploy-option__icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                      <path d="M18 10a6 6 0 1 0-11.8 1.5A5 5 0 1 0 7 21h11a5 5 0 0 0 0-10z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+                    </svg>
+                  </div>
+                  <div>
+                    <div className="deploy-option__title">
+                      Cloud DNS
+                      <span className="deploy-option__badge deploy-option__badge--paid">From $3/mo</span>
+                    </div>
+                    <p className="deploy-option__desc">
+                      Use our managed cloud DNS infrastructure. Works everywhere including mobile networks and while traveling.
+                    </p>
+                    <div className="deploy-option__tags">
+                      <span className="dep-tag">Global Anycast</span>
+                      <span className="dep-tag">DoH / DoT</span>
+                      <span className="dep-tag">Mobile Ready</span>
+                    </div>
+                  </div>
+                </div>
+                {deployment === 'cloud' && (
+                  <div className="deploy-option__check">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                      <path d="M20 6L9 17l-5-5" stroke="#080c0a" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </div>
+                )}
+              </div>
+
+              <div
                 className={`deploy-option ${deployment === 'self' ? 'deploy-option--active' : ''}`}
                 onClick={() => setDeployment('self')}
               >
@@ -285,40 +333,6 @@ export default function Signup() {
                   </div>
                 </div>
                 {deployment === 'self' && (
-                  <div className="deploy-option__check">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                      <path d="M20 6L9 17l-5-5" stroke="#080c0a" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </div>
-                )}
-              </div>
-
-              <div
-                className={`deploy-option ${deployment === 'cloud' ? 'deploy-option--active' : ''}`}
-                onClick={() => setDeployment('cloud')}
-              >
-                <div className="deploy-option__left">
-                  <div className="deploy-option__icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                      <path d="M18 10a6 6 0 1 0-11.8 1.5A5 5 0 1 0 7 21h11a5 5 0 0 0 0-10z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
-                    </svg>
-                  </div>
-                  <div>
-                    <div className="deploy-option__title">
-                      Cloud DNS
-                      <span className="deploy-option__badge deploy-option__badge--paid">From $3/mo</span>
-                    </div>
-                    <p className="deploy-option__desc">
-                      Use our managed cloud DNS infrastructure. Works everywhere including mobile networks and while traveling.
-                    </p>
-                    <div className="deploy-option__tags">
-                      <span className="dep-tag">Global Anycast</span>
-                      <span className="dep-tag">DoH / DoT</span>
-                      <span className="dep-tag">Mobile Ready</span>
-                    </div>
-                  </div>
-                </div>
-                {deployment === 'cloud' && (
                   <div className="deploy-option__check">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                       <path d="M20 6L9 17l-5-5" stroke="#080c0a" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />

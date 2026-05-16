@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import DashboardTopBar from '../../components/DashboardTopBar/DashboardTopBar'
 import protobuf from 'protobufjs'
 import '../UserDashboard/UserDashboard.css'
 import './Blocklists.css'
@@ -51,7 +52,7 @@ const navItems = [
   { id: 'settings',   label: 'Settings',   icon: (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
       <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.8"/>
-      <path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+      <path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
     </svg>
   )},
 ]
@@ -135,10 +136,6 @@ export default function Blocklists() {
     setShowAddForm(false)
   }
 
-  const handleLogout = () => {
-    localStorage.clear()
-    navigate('/')
-  }
 
   const handleNav = (id) => {
     if (id === 'overview') navigate('/dashboard')
@@ -182,27 +179,7 @@ export default function Blocklists() {
       <div className="udash__main">
 
         {/* Top bar */}
-        <header className="udash__topbar">
-          <div className="udash__status">
-            <span className="udash__status-dot" />
-            {isSyncing ? 'Syncing...' : 'Filtering active'}
-          </div>
-          <div className="udash__topbar-right">
-            <button className="udash__icon-btn">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-              </svg>
-            </button>
-            <button className="udash__icon-btn" onClick={handleLogout}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                <polyline points="16 17 21 12 16 7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                <line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-              </svg>
-            </button>
-          </div>
-        </header>
+        <DashboardTopBar status={isSyncing ? 'Syncing...' : 'Filtering active'} />
 
         {/* Content */}
         <div className="udash__content">
@@ -215,21 +192,6 @@ export default function Blocklists() {
                 Manage your DNS blocklist subscriptions. {activeCount} active, {totalDomains.toLocaleString()} domains.
               </p>
             </div>
-<<<<<<< HEAD
-            
-            {/* UPDATED HEADER ACTIONS */}
-            <div className="bl__header-actions">
-              <button className="bl__action-btn bl__action-btn--primary">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                  <polyline points="23 4 23 10 17 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-                Update All
-              </button>
-            </div>
-            {/* END UPDATED HEADER ACTIONS */}
-
-=======
             <div className="bl__header-actions">
               <button className="bl__action-btn">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
@@ -246,7 +208,6 @@ export default function Blocklists() {
                 Add List
               </button>
             </div>
->>>>>>> 785ef3bd7a628e55569532b5be494abf5dc75fd9
           </div>
 
           {/* Add Custom Blocklist Form */}
@@ -326,8 +287,4 @@ export default function Blocklists() {
       </div>
     </div>
   )
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 785ef3bd7a628e55569532b5be494abf5dc75fd9

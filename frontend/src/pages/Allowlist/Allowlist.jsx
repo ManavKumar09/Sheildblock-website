@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import DashboardTopBar from '../../components/DashboardTopBar/DashboardTopBar'
 import '../UserDashboard/UserDashboard.css'
 import './Allowlist.css'
 
@@ -52,11 +53,8 @@ const navItems = [
 export default function Allowlist() {
   const navigate = useNavigate()
   const [entries, setEntries] = useState(initialEntries)
-<<<<<<< HEAD
-=======
   const [newDomain, setNewDomain] = useState('')
   const [newReason, setNewReason] = useState('')
->>>>>>> 785ef3bd7a628e55569532b5be494abf5dc75fd9
   const [search, setSearch] = useState('')
 
   const filteredEntries = entries.filter(e =>
@@ -64,8 +62,6 @@ export default function Allowlist() {
     e.reason.toLowerCase().includes(search.toLowerCase())
   )
 
-<<<<<<< HEAD
-=======
   const handleAdd = () => {
     if (!newDomain.trim()) return
     const entry = {
@@ -79,15 +75,10 @@ export default function Allowlist() {
     setNewReason('')
   }
 
->>>>>>> 785ef3bd7a628e55569532b5be494abf5dc75fd9
   const handleDelete = (id) => {
     setEntries(prev => prev.filter(e => e.id !== id))
   }
 
-  const handleLogout = () => {
-    localStorage.clear()
-    navigate('/')
-  }
 
   const handleNav = (id) => {
     if (id === 'overview') navigate('/dashboard')
@@ -131,45 +122,19 @@ export default function Allowlist() {
       <div className="udash__main">
 
         {/* Top bar */}
-        <header className="udash__topbar">
-          <div className="udash__status">
-            <span className="udash__status-dot" />
-            Filtering active
-          </div>
-          <div className="udash__topbar-right">
-            <button className="udash__icon-btn">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-              </svg>
-            </button>
-            <button className="udash__icon-btn" onClick={handleLogout}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                <polyline points="16 17 21 12 16 7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                <line x1="21" y1="12" x2="9" y2="12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-              </svg>
-            </button>
-          </div>
-        </header>
+        <DashboardTopBar />
 
         {/* Content */}
         <div className="udash__content">
 
           {/* Page header */}
-<<<<<<< HEAD
-          <div className="al__page-header" style={{ marginBottom: '1.5rem' }}>
-=======
           <div className="al__page-header">
->>>>>>> 785ef3bd7a628e55569532b5be494abf5dc75fd9
             <h1 className="al__title">Allowlist</h1>
             <p className="al__subtitle">
               Domains on this list will never be blocked, even if they appear in a blocklist. {entries.length} entries.
             </p>
           </div>
 
-<<<<<<< HEAD
-=======
           {/* Add domain form */}
           <div className="al__add-form">
             <h3 className="al__add-form-title">Add domain to allowlist</h3>
@@ -200,7 +165,6 @@ export default function Allowlist() {
             </div>
           </div>
 
->>>>>>> 785ef3bd7a628e55569532b5be494abf5dc75fd9
           {/* Search */}
           <div className="al__search">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -243,8 +207,4 @@ export default function Allowlist() {
       </div>
     </div>
   )
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 785ef3bd7a628e55569532b5be494abf5dc75fd9
