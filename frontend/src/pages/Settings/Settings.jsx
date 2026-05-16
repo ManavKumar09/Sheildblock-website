@@ -46,9 +46,12 @@ export default function Settings() {
 
   const [dnsFiltering, setDnsFiltering] = useState(true)
   const [dnssec, setDnssec] = useState(true)
+<<<<<<< HEAD
+=======
   const [rateLimiting, setRateLimiting] = useState(true)
   const [blockingMode, setBlockingMode] = useState('null')
   const [queryLogging, setQueryLogging] = useState(true)
+>>>>>>> 785ef3bd7a628e55569532b5be494abf5dc75fd9
   const [anonymizeLogs, setAnonymizeLogs] = useState(false)
   const [logRetention, setLogRetention] = useState('7')
   const [pushNotifications, setPushNotifications] = useState(true)
@@ -176,6 +179,8 @@ export default function Settings() {
               </div>
               <Toggle value={dnssec} onChange={setDnssec} />
             </div>
+<<<<<<< HEAD
+=======
 
             <div className="st__row">
               <div className="st__row-info">
@@ -197,6 +202,7 @@ export default function Settings() {
                 <option value="custom">Custom IP</option>
               </select>
             </div>
+>>>>>>> 785ef3bd7a628e55569532b5be494abf5dc75fd9
           </div>
 
           {/* ── Logging ── */}
@@ -213,6 +219,8 @@ export default function Settings() {
 
             <div className="st__row">
               <div className="st__row-info">
+<<<<<<< HEAD
+=======
                 <span className="st__row-label">Query Logging</span>
                 <span className="st__row-desc">Log all DNS queries for analytics and debugging.</span>
               </div>
@@ -221,6 +229,7 @@ export default function Settings() {
 
             <div className="st__row">
               <div className="st__row-info">
+>>>>>>> 785ef3bd7a628e55569532b5be494abf5dc75fd9
                 <span className="st__row-label">Anonymize Logs</span>
                 <span className="st__row-desc">Mask client IP addresses in logs for additional privacy.</span>
               </div>
@@ -238,7 +247,11 @@ export default function Settings() {
                 <option value="7">7 days</option>
                 <option value="14">14 days</option>
                 <option value="30">30 days</option>
+<<<<<<< HEAD
+                <option value="60">60 days</option>
+=======
                 <option value="90">90 days</option>
+>>>>>>> 785ef3bd7a628e55569532b5be494abf5dc75fd9
               </select>
             </div>
           </div>
@@ -342,6 +355,8 @@ export default function Settings() {
 
             <div className="st__row">
               <div className="st__row-info">
+<<<<<<< HEAD
+=======
                 <span className="st__row-label">Flush DNS Cache</span>
                 <span className="st__row-desc">Clear all cached DNS responses.</span>
               </div>
@@ -356,6 +371,7 @@ export default function Settings() {
 
             <div className="st__row">
               <div className="st__row-info">
+>>>>>>> 785ef3bd7a628e55569532b5be494abf5dc75fd9
                 <span className="st__row-label st__row-label--danger">Delete All Data</span>
                 <span className="st__row-desc">Permanently delete all logs, settings, and blocklists.</span>
               </div>
@@ -373,4 +389,8 @@ export default function Settings() {
       </div>
     </div>
   )
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 785ef3bd7a628e55569532b5be494abf5dc75fd9
