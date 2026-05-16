@@ -1,7 +1,6 @@
-import os
+# import os
 import secrets
-import time
-from fastapi import FastAPI, Depends, HTTPException, status, Request
+from fastapi import FastAPI, Depends, HTTPException, status, Request, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
@@ -19,31 +18,31 @@ from email_utils import create_verification_token, send_verification_email, deco
 Base.metadata.create_all(bind=engine)
 
 # Development mode flag: auto-seed a verified dev user and skip email verification during development.
-DEV_MODE = os.getenv("DEV_MODE", "false").lower() in ("1", "true", "yes")
-DEV_USER_EMAIL = os.getenv("DEV_USER_EMAIL", "dev@shieldblock.local")
-DEV_USER_PASSWORD = os.getenv("DEV_USER_PASSWORD", "devpass")
-DEV_USER_NAME = os.getenv("DEV_USER_NAME", "Developer")
+# DEV_MODE = os.getenv("DEV_MODE", "false").lower() in ("1", "true", "yes")
+# DEV_USER_EMAIL = os.getenv("DEV_USER_EMAIL", "dev@shieldblock.local")
+# DEV_USER_PASSWORD = os.getenv("DEV_USER_PASSWORD", "devpass")
+# DEV_USER_NAME = os.getenv("DEV_USER_NAME", "Developer")
 
 
-def ensure_dev_user():
-    if not DEV_MODE:
-        return
+# def ensure_dev_user():
+#     if not DEV_MODE:
+#         return
 
-    with SessionLocal() as db:
-        dev_user = users.get_user_by_email(db, email=DEV_USER_EMAIL)
-        if not dev_user:
-            dev_user_payload = schemas.UserCreate(
-                name=DEV_USER_NAME,
-                email=DEV_USER_EMAIL,
-                password=DEV_USER_PASSWORD,
-            )
-            dev_user = users.create_user(db=db, user=dev_user_payload)
+#     with SessionLocal() as db:
+#         dev_user = users.get_user_by_email(db, email=DEV_USER_EMAIL)
+#         if not dev_user:
+#             dev_user_payload = schemas.UserCreate(
+#                 name=DEV_USER_NAME,
+#                 email=DEV_USER_EMAIL,
+#                 password=DEV_USER_PASSWORD,
+#             )
+#             dev_user = users.create_user(db=db, user=dev_user_payload)
 
-        if not dev_user.is_verified:
-            users.verify_user(db, DEV_USER_EMAIL)
+#         if not dev_user.is_verified:
+#             users.verify_user(db, DEV_USER_EMAIL)
 
 
-ensure_dev_user()
+# ensure_dev_user()
 
 # Setup Rate Limiter (limits based on User's IP address)
 # limiter = Limiter(key_func=get_remote_address)
@@ -65,41 +64,19 @@ app.add_middleware(
 
 @app.post("/register", response_model=schemas.UserResponse)
 # @limiter.limit("5/minute") # Max 5 signups per minute per IP
-async def register(request: Request, user: schemas.UserCreate, db: Session = Depends(get_db)):
-    start_time = time.perf_counter()
-
+async def register(request: Request, user: schemas.UserCreate, db: Session = Depends(get_db), background_tasks: BackgroundTasks = None):
     db_user = users.get_user_by_email(db, email=user.email)
     if db_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     
-    create_start = time.perf_counter()
     new_user = users.create_user(db=db, user=user)
-    create_duration = time.perf_counter() - create_start
 
-    if DEV_MODE:
-        verify_start = time.perf_counter()
-        users.verify_user(db, new_user.email)
-        verify_duration = time.perf_counter() - verify_start
-        total_duration = time.perf_counter() - start_time
-        print(
-            f"[REGISTER] total={total_duration*1000:.2f}ms, "
-            f"create_user={create_duration*1000:.2f}ms, "
-            f"verify_user={verify_duration*1000:.2f}ms"
-        )
-        return new_user
+    # if DEV_MODE:
+    #     users.verify_user(db, new_user.email)
+    #     return new_user
 
     token = create_verification_token(new_user.email)
-
-    email_start = time.perf_counter()
-    await send_verification_email(new_user.email, token)
-    email_duration = time.perf_counter() - email_start
-
-    total_duration = time.perf_counter() - start_time
-    print(
-        f"[REGISTER] total={total_duration*1000:.2f}ms, "
-        f"create_user={create_duration*1000:.2f}ms, "
-        f"email_send={email_duration*1000:.2f}ms"
-    )
+    background_tasks.add_task(send_verification_email, new_user.email, token)
     
     return new_user
 
@@ -140,13 +117,13 @@ async def login(request: Request, user_credentials: schemas.UserLogin, db: Sessi
     
     # 3. Check if user is verified
     if not user.is_verified:
-        if DEV_MODE and user.email == DEV_USER_EMAIL:
-            users.verify_user(db, user.email)
-        else:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Please verify your email before logging in."
-            )
+        # if DEV_MODE and user.email == DEV_USER_EMAIL:
+        #     users.verify_user(db, user.email)
+        # else:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Please verify your email before logging in."
+        )
         
     # 4. Generate JWT Token
     access_token = create_access_token(data={"sub": user.id})
