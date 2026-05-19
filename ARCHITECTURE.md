@@ -9,8 +9,8 @@ This document provides a detailed architecture overview for ShieldBlock. It is d
 ShieldBlock is a multi-tier application with three main layers:
 
 1. Frontend: A React + Vite single-page application (SPA) that provides user registration, verification, onboarding, and dashboard pages.
-2. Backend (CloudDNS API): A FastAPI service that handles user management, email verification, authentication, cloud DNS profile generation, and persistence.
-3. DNS Server: A separate Go-based DNS server that receives DNS queries from users and returns filtered responses based on configured filtering lists.
+2. Backend (API): A FastAPI service that handles user management, email verification, authentication, DNS profile generation, and persistence.
+3. DNS Server: A separate Go-based DNS-over-TLS (DoT) resolver that receives encrypted DNS queries from users and returns filtered responses based on configured filtering lists.
 
 Additional elements:
 
@@ -36,8 +36,10 @@ Additional elements:
 - DNS Server / Go application
   - `dns-server/main.go`
   - `dns-server/main_test.go`
-  - Listens for DNS queries on port 53 (configurable)
-  - Returns filtered responses based on user's configuration hash
+  - `dns-server/plan.md` — detailed dns-server roadmap and design decisions
+  - Listens for DNS-over-TLS (DoT) on port 853 (configurable)
+  - Identifies users via TLS SNI: `{config_hash}.dns.shieldblock.in`
+  - Returns filtered responses (sinkhole or upstream) based on the user's `filters_bitmask`
 - Persistence
   - `backend/CloudDNS/shieldblock.db`
 - Config
@@ -78,7 +80,7 @@ Key responsibilities:
     - Requires authentication via `get_current_user_id`
     - Converts the selected DNS filter options into a bitmask
     - Creates a new `CloudDNSConfig` record
-    - Returns a `dns_url` based on a secure config hash
+    - Returns a `config_hash` of the form `{config_hash}.dns.shieldblock.in`
 
 Authentication helpers:
 
@@ -130,7 +132,7 @@ Models:
   - `user_id`: foreign key to `users.id`
   - `profile_name`: friendly name for the DNS profile
   - `filters_bitmask`: integer storing selected filter categories
-  - `config_hash`: secure unique hash used to derive the DNS profile URL
+  - `config_hash`: secure unique hash used in the DoT endpoint hostname (`{config_hash}.dns.shieldblock.in`)
   - `owner`: relationship back to the `User`
 
 ### `backend/CloudDNS/schemas.py`
@@ -221,7 +223,7 @@ Lists backend Python dependencies:
 
 ## DNS Server Architecture
 
-The DNS server is a separate Go-based service responsible for handling all DNS queries from users. It operates independently from the backend API and provides real-time DNS filtering enforcement.
+The DNS server is a separate Go-based service responsible for handling all DNS queries from users over DNS-over-TLS (DoT). It operates independently from the backend API and provides real-time DNS filtering enforcement. For phased implementation details and tradeoffs, see `dns-server/plan.md`.
 
 ### `dns-server/main.go`
 
@@ -229,13 +231,13 @@ The core DNS server application.
 
 Key responsibilities:
 
-- Listens for incoming DNS queries (typically on port 53 UDP)
-- Receives DNS requests containing a configuration hash (derived from the user's profile)
-- Looks up the corresponding `CloudDNSConfig` from the database using the config hash
+- Listens for DNS-over-TLS (DoT) on port 853 (configurable)
+- Identifies the user profile from the TLS **SNI** hostname: `{config_hash}.dns.shieldblock.in` (the config hash is not carried in the DNS query payload or as a query parameter)
+- Looks up the corresponding `CloudDNSConfig` from the database using the config hash **on each query** (MVP); a planned improvement is **connection-scoped authentication** during the TLS handshake so policy is reused across queries on the same connection (see `dns-server/plan.md` Phase 5)
 - Extracts the `filters_bitmask` from the user's configuration
 - Compares the queried domain against filtering lists (ads, malware, adult, tracking, phishing, social)
-- If the domain matches a category in the user's enabled filters, returns a NXDOMAIN or null response (blocked)
-- If the domain is not blocked, forwards the query to an upstream resolver and returns the legitimate response
+- If the domain matches a category in the user's enabled filters, returns a sinkhole response: **A → `0.0.0.0`**, **AAAA → `::`**
+- If the domain is not blocked, forwards the query to an upstream resolver and returns the response. **Currently:** Cloudflare only. **Planned:** multiple upstream providers with health tracking and failover (see `dns-server/plan.md` Phase 19)
 - Operates independently and does not require the backend API to be running for DNS queries to be processed
 
 ### `dns-server/go.mod`
@@ -368,17 +370,15 @@ Important entries:
 
 ### DNS query and filtering flow
 
-1. User configures their device to use the ShieldBlock DNS server (e.g., `<config_hash>.shieldblock.in`).
-2. When the user's browser or device makes a DNS query, it connects to the ShieldBlock DNS server.
-3. The DNS server extracts the configuration hash from the incoming query (e.g., subdomain or query parameter).
-4. The DNS server queries the database to retrieve the user's `CloudDNSConfig` using the hash.
-5. The server reads the `filters_bitmask` to determine which filter categories are active.
-6. The server resolves the queried domain name against filtering lists:
-   - If the domain matches a category in the enabled filters, the server returns a NXDOMAIN response (blocked).
-   - If the domain is not blocked, the server forwards the query to an upstream DNS resolver and returns the legitimate response.
-7. The user's device receives the filtered DNS response.
+1. User configures their device for DNS-over-TLS (DoT) to ShieldBlock on port 853, with the resolver hostname `<config_hash>.dns.shieldblock.in` (issued as `dns_url` from the backend).
+2. The device opens a TLS connection to the ShieldBlock DNS server; the **config hash is sent only via TLS SNI** in that hostname.
+3. For each DNS query on the connection (MVP), the server looks up the user's `CloudDNSConfig` in the database by config hash and reads `filters_bitmask`. (Planned: authenticate once per TLS connection and reuse policy — see `dns-server/plan.md` Phase 5.)
+4. The server resolves the queried domain against filtering lists for the enabled categories.
+5. If the domain is blocked, the server returns a sinkhole answer: **A → `0.0.0.0`**, **AAAA → `::`**.
+6. If the domain is allowed, the server forwards to upstream DNS (currently Cloudflare; multiple upstreams planned per `dns-server/plan.md` Phase 19) and returns the response.
+7. The device receives the filtered DNS response over the same DoT connection.
 
-This ensures that filtering decisions are made in real-time and independently of the backend API availability.
+Filtering decisions are made in real time and independently of backend API availability (the resolver reads the shared database directly).
 
 ## Environment and Runtime
 
@@ -452,18 +452,22 @@ This section helps future developers or AI agents decide where to extend the pro
 - `dns-server/main.go` — DNS server application, query handling, and filtering logic.
 - `dns-server/main_test.go` — DNS server tests.
 - `dns-server/go.mod` — Go module and dependencies.
+- `dns-server/plan.md` — dns-server engineering roadmap (source of truth for resolver design).
 
 ## Notes for AI-assisted development
 
 When providing project context to an AI assistant, include these items:
 
 - The project comprises three independent services: React SPA frontend, FastAPI backend, and Go DNS server.
-- The DNS server is a critical component that handles real-time user DNS queries independently.
+- The DNS server is a critical component that handles real-time user DNS queries over **DoT on port 853**, with identity from **TLS SNI** (`{config_hash}.dns.shieldblock.in`).
+- DNS filter selection is encoded as a bitmask in the backend; the resolver loads policy via **per-query database lookup** (MVP), with **connection-scoped auth** planned (`dns-server/plan.md` Phase 5).
+- Blocked domains return sinkhole records (**A → `0.0.0.0`**, **AAAA → `::`**)
+- Upstream resolution is **Cloudflare-only** today; **multiple upstreams** are planned (`dns-server/plan.md` Phase 19).
+- For dns-server design and evolution, **`dns-server/plan.md` is the source of truth**; this document summarizes the dns-server architecture.
 - Authentication flow relies on JWT and email verification in the backend.
 - User signup uses a 2-step email confirmation + deployment onboarding flow.
 - `localStorage` stores login state, token, and deployment preferences in the frontend.
-- DNS filter selection is encoded as a bitmask in the backend and used by the DNS server for filtering decisions.
 - Backend uses SQLite by default but is configured to support other DBs through `DATABASE_URL`.
-- The DNS server accesses the same database to look up user configurations using their config hash.
+- The DNS server accesses the same database to look up user configurations using the config hash from SNI.
 
 This file should give a developer or AI chatbot a comprehensive understanding of the project layout, important files, and major functional flows.
