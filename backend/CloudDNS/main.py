@@ -168,19 +168,21 @@ async def create_cloud_config(
     config_hash = secrets.token_hex(30)
     
     new_config = models.CloudDNSConfig(
-        user_id=user_id,
-        profile_name=config.profile_name,
         filters_bitmask=bitmask,
         config_hash=config_hash
     )
     db.add(new_config)
+    
+    # Update the user's config_hash
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if user:
+        user.config_hash = config_hash
+
     db.commit()
     db.refresh(new_config)
     
     # Return response including the full DNS URL
     response_data = schemas.CloudConfigResponse(
-        id=new_config.id,
-        profile_name=new_config.profile_name,
         filters_bitmask=new_config.filters_bitmask,
         config_hash=new_config.config_hash,
         dns_url=f"{config_hash}.shieldblock.in"

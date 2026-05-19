@@ -171,7 +171,6 @@ export default function Onboarding() {
             "Authorization": `Bearer ${localStorage.getItem('token')}` 
           },
           body: JSON.stringify({
-            profile_name: profileName || "My Profile",
             filters: filters
           })
         });
@@ -480,19 +479,7 @@ export default function Onboarding() {
                     </div>
                   </div>
 
-                  {/* IPv4 / IPv6 */}
-                  <div className="onboard__dns-encrypted-row">
-                    <div className="onboard__dns-method-card">
-                      <h3 className="onboard__dns-method-title">IPv4 Addresses</h3>
-                      <p className="onboard__dns-ip">45.90.28.1</p>
-                      <p className="onboard__dns-ip">45.90.30.1</p>
-                    </div>
-                    <div className="onboard__dns-method-card">
-                      <h3 className="onboard__dns-method-title">IPv6 Addresses</h3>
-                      <p className="onboard__dns-ip onboard__dns-ip--green">2a07:a8c0::a1:b2c3</p>
-                      <p className="onboard__dns-ip">2a07:a8c1::a1:b2c3</p>
-                    </div>
-                  </div>
+
                 </div>
               </div>
             )}

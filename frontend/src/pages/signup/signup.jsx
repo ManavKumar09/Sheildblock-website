@@ -66,6 +66,7 @@ export default function Signup() {
     localStorage.setItem('userName', form.email)
     localStorage.setItem('token', 'dummy-token-for-dev')
     setStep(2)
+
   }
 
   const handleCreate = async (e) => {
@@ -97,7 +98,8 @@ export default function Signup() {
     } catch (err) {
       setErrorMsg(err.message);
     }
-    */
+      */
+
     // Dummy signin logic: bypass backend
     localStorage.setItem('isLoggedIn', 'true')
     localStorage.setItem('userName', form.email)

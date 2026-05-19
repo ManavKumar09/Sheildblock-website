@@ -24,12 +24,9 @@ class UserResponse(BaseModel):
         from_attributes = True
 
 class CloudConfigCreate(BaseModel):
-    profile_name: str
     filters: Dict[str, bool] # e.g. {"ads": True, "malware": True, "adult": False}
 
 class CloudConfigResponse(BaseModel):
-    id: str
-    profile_name: str
     filters_bitmask: int
     config_hash: str
     dns_url: str
