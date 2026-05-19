@@ -5,81 +5,72 @@ import '../UserDashboard/UserDashboard.css'
 import './Allowlist.css'
 
 const initialEntries = [
-  { id: 1, domain: 's.youtube.com',       reason: 'YouTube history sync',     added: '2 days ago' },
-  { id: 2, domain: 'cdn.onesignal.com',   reason: 'Push notifications',      added: '5 days ago' },
-  { id: 3, domain: 'graph.facebook.com',  reason: 'Facebook login',          added: '1 week ago' },
-  { id: 4, domain: 'api.amplitude.com',   reason: 'Analytics dashboard',     added: '1 week ago' },
-  { id: 5, domain: 'slack-imgs.com',      reason: 'Slack image previews',    added: '2 weeks ago' },
+  { id: 1, domain: 's.youtube.com', reason: 'YouTube history sync', added: '2 days ago' },
+  { id: 2, domain: 'cdn.onesignal.com', reason: 'Push notifications', added: '5 days ago' },
+  { id: 3, domain: 'graph.facebook.com', reason: 'Facebook login', added: '1 week ago' },
+  { id: 4, domain: 'api.amplitude.com', reason: 'Analytics dashboard', added: '1 week ago' },
+  { id: 5, domain: 'slack-imgs.com', reason: 'Slack image previews', added: '2 weeks ago' },
 ]
 
 const navItems = [
-  { id: 'overview',   label: 'Overview',   icon: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-      <rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1.8"/>
-      <rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1.8"/>
-      <rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1.8"/>
-      <rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1.8"/>
-    </svg>
-  )},
-  { id: 'querylog',   label: 'Query Log',  icon: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
-  )},
-  { id: 'blocklists', label: 'Blocklists', icon: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-      <path d="M12 2L4 5.5V11c0 4.5 3.4 8.7 8 9.9 4.6-1.2 8-5.4 8-9.9V5.5L12 2z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/>
-    </svg>
-  )},
-  { id: 'allowlist',  label: 'Allowlist',  icon: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-      <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
-  )},
-  { id: 'domains',    label: 'Domains',    icon: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8"/>
-      <path d="M12 3a9 9 0 0 1 0 18M3 12h18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-    </svg>
-  )},
-  { id: 'settings',   label: 'Settings',   icon: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.8"/>
-      <path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-    </svg>
-  )},
+  {
+    id: 'overview', label: 'Overview', icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1.8" />
+        <rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1.8" />
+        <rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1.8" />
+        <rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1.8" />
+      </svg>
+    )
+  },
+  {
+    id: 'querylog', label: 'Query Log', icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    )
+  },
+  {
+    id: 'blocklists', label: 'Blocklists', icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2L4 5.5V11c0 4.5 3.4 8.7 8 9.9 4.6-1.2 8-5.4 8-9.9V5.5L12 2z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+      </svg>
+    )
+  },
+  {
+    id: 'allowlist', label: 'Allowlist', icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    )
+  },
+  {
+    id: 'domains', label: 'Domains', icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8" />
+        <path d="M12 3a9 9 0 0 1 0 18M3 12h18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      </svg>
+    )
+  },
+  {
+    id: 'settings', label: 'Settings', icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.8" />
+        <path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      </svg>
+    )
+  },
 ]
 
 export default function Allowlist() {
   const navigate = useNavigate()
   const [entries, setEntries] = useState(initialEntries)
-<<<<<<< HEAD
-  const [newDomain, setNewDomain] = useState('')
-  const [newReason, setNewReason] = useState('')
-=======
->>>>>>> 1913ed0f29605d1197ad2682b297afcda2bb2bfa
   const [search, setSearch] = useState('')
   const filteredEntries = entries.filter(e =>
     e.domain.toLowerCase().includes(search.toLowerCase()) ||
     e.reason.toLowerCase().includes(search.toLowerCase())
   )
 
-<<<<<<< HEAD
-  const handleAdd = () => {
-    if (!newDomain.trim()) return
-    const entry = {
-      id: Date.now(),
-      domain: newDomain.trim(),
-      reason: newReason.trim() || '',
-      added: 'just now',
-    }
-    setEntries(prev => [entry, ...prev])
-    setNewDomain('')
-    setNewReason('')
-  }
-
-=======
->>>>>>> 1913ed0f29605d1197ad2682b297afcda2bb2bfa
   const handleDelete = (id) => {
     setEntries(prev => prev.filter(e => e.id !== id))
   }
@@ -102,8 +93,8 @@ export default function Allowlist() {
         <div className="udash__sidebar-logo" onClick={() => navigate('/')}>
           <div className="udash__sidebar-logo-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2L4 5.5V11c0 4.5 3.4 8.7 8 9.9 4.6-1.2 8-5.4 8-9.9V5.5L12 2z" fill="var(--green)"/>
-              <path d="M9 12l2 2 4-4" stroke="#080c0a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M12 2L4 5.5V11c0 4.5 3.4 8.7 8 9.9 4.6-1.2 8-5.4 8-9.9V5.5L12 2z" fill="var(--green)" />
+              <path d="M9 12l2 2 4-4" stroke="#080c0a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
           <span className="udash__sidebar-logo-text"><span>Shield</span>Block</span>
@@ -133,55 +124,18 @@ export default function Allowlist() {
         <div className="udash__content">
 
           {/* Page header */}
-<<<<<<< HEAD
-          <div className="al__page-header">
-=======
           <div className="al__page-header" style={{ marginBottom: '1.5rem' }}>
->>>>>>> 1913ed0f29605d1197ad2682b297afcda2bb2bfa
             <h1 className="al__title">Allowlist</h1>
             <p className="al__subtitle">
               Domains on this list will never be blocked, even if they appear in a blocklist. {entries.length} entries.
             </p>
           </div>
 
-<<<<<<< HEAD
-          {/* Add domain form */}
-          <div className="al__add-form">
-            <h3 className="al__add-form-title">Add domain to allowlist</h3>
-            <div className="al__add-form-row">
-              <input
-                type="text"
-                className="al__add-form-input al__add-form-input--domain"
-                placeholder="domain.com"
-                value={newDomain}
-                onChange={(e) => setNewDomain(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
-              />
-              <input
-                type="text"
-                className="al__add-form-input al__add-form-input--reason"
-                placeholder="Reason (optional)"
-                value={newReason}
-                onChange={(e) => setNewReason(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
-              />
-              <button className="al__add-form-submit" onClick={handleAdd}>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                  <line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/>
-                  <line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"/>
-                </svg>
-                Add
-              </button>
-            </div>
-          </div>
-
-=======
->>>>>>> 1913ed0f29605d1197ad2682b297afcda2bb2bfa
           {/* Search */}
           <div className="al__search">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="1.8"/>
-              <line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+              <circle cx="11" cy="11" r="8" stroke="currentColor" strokeWidth="1.8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
             </svg>
             <input
               type="text"
@@ -204,8 +158,8 @@ export default function Allowlist() {
                 </div>
                 <button className="al__item-delete" onClick={() => handleDelete(entry.id)} aria-label={`Remove ${entry.domain}`}>
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                    <polyline points="3 6 5 6 21 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                    <polyline points="3 6 5 6 21 6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </button>
               </div>

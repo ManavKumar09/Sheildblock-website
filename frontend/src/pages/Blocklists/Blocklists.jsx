@@ -6,55 +6,67 @@ import '../UserDashboard/UserDashboard.css'
 import './Blocklists.css'
 
 const blocklistData = [
-  { id: 1, name: 'EasyList',           category: 'Ads',      domains: 78453,  updated: '2 hours ago',  enabled: true },
-  { id: 2, name: 'EasyPrivacy',        category: 'Trackers', domains: 45231,  updated: '2 hours ago',  enabled: true },
-  { id: 3, name: 'AdGuard DNS filter', category: 'Ads',      domains: 62890,  updated: '4 hours ago',  enabled: true },
-  { id: 4, name: 'URLhaus Malware',    category: 'Malware',  domains: 12340,  updated: '1 hour ago',   enabled: true },
-  { id: 5, name: 'PhishTank',          category: 'Phishing', domains: 8920,   updated: '3 hours ago',  enabled: true },
-  { id: 6, name: 'Fanboy Tracking',    category: 'Trackers', domains: 34560,  updated: '6 hours ago',  enabled: false },
-  { id: 7, name: 'Fanboy Social',      category: 'Social',   domains: 21340,  updated: '6 hours ago',  enabled: false },
-  { id: 8, name: 'OISD Full',          category: 'Multi',    domains: 189000, updated: '1 hour ago',   enabled: false },
-  { id: 9, name: 'Steven Black Hosts', category: 'Ads',      domains: 95230,  updated: '12 hours ago', enabled: false },
+  { id: 1, name: 'EasyList', category: 'Ads', domains: 78453, updated: '2 hours ago', enabled: true },
+  { id: 2, name: 'EasyPrivacy', category: 'Trackers', domains: 45231, updated: '2 hours ago', enabled: true },
+  { id: 3, name: 'AdGuard DNS filter', category: 'Ads', domains: 62890, updated: '4 hours ago', enabled: true },
+  { id: 4, name: 'URLhaus Malware', category: 'Malware', domains: 12340, updated: '1 hour ago', enabled: true },
+  { id: 5, name: 'PhishTank', category: 'Phishing', domains: 8920, updated: '3 hours ago', enabled: true },
+  { id: 6, name: 'Fanboy Tracking', category: 'Trackers', domains: 34560, updated: '6 hours ago', enabled: false },
+  { id: 7, name: 'Fanboy Social', category: 'Social', domains: 21340, updated: '6 hours ago', enabled: false },
+  { id: 8, name: 'OISD Full', category: 'Multi', domains: 189000, updated: '1 hour ago', enabled: false },
+  { id: 9, name: 'Steven Black Hosts', category: 'Ads', domains: 95230, updated: '12 hours ago', enabled: false },
 ]
 
 const categories = ['All', 'Ads', 'Trackers', 'Malware', 'Phishing', 'Social', 'Multi']
 
 const navItems = [
-  { id: 'overview',   label: 'Overview',   icon: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-      <rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1.8"/>
-      <rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1.8"/>
-      <rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1.8"/>
-      <rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1.8"/>
-    </svg>
-  )},
-  { id: 'querylog',   label: 'Query Log',  icon: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
-  )},
-  { id: 'blocklists', label: 'Blocklists', icon: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-      <path d="M12 2L4 5.5V11c0 4.5 3.4 8.7 8 9.9 4.6-1.2 8-5.4 8-9.9V5.5L12 2z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/>
-    </svg>
-  )},
-  { id: 'allowlist',  label: 'Allowlist',  icon: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-      <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
-  )},
-  { id: 'domains',    label: 'Domains',    icon: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8"/>
-      <path d="M12 3a9 9 0 0 1 0 18M3 12h18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-    </svg>
-  )},
-  { id: 'settings',   label: 'Settings',   icon: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.8"/>
-      <path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-    </svg>
-  )},
+  {
+    id: 'overview', label: 'Overview', icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1.8" />
+        <rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1.8" />
+        <rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1.8" />
+        <rect x="14" y="14" width="7" height="7" rx="1" stroke="currentColor" strokeWidth="1.8" />
+      </svg>
+    )
+  },
+  {
+    id: 'querylog', label: 'Query Log', icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    )
+  },
+  {
+    id: 'blocklists', label: 'Blocklists', icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2L4 5.5V11c0 4.5 3.4 8.7 8 9.9 4.6-1.2 8-5.4 8-9.9V5.5L12 2z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+      </svg>
+    )
+  },
+  {
+    id: 'allowlist', label: 'Allowlist', icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    )
+  },
+  {
+    id: 'domains', label: 'Domains', icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8" />
+        <path d="M12 3a9 9 0 0 1 0 18M3 12h18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      </svg>
+    )
+  },
+  {
+    id: 'settings', label: 'Settings', icon: (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.8" />
+        <path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      </svg>
+    )
+  },
 ]
 
 export default function Blocklists() {
@@ -66,10 +78,10 @@ export default function Blocklists() {
   const [newListUrl, setNewListUrl] = useState('')
   const [isSyncing, setIsSyncing] = useState(false)
 
-  const filteredLists = activeCategory === 'All' 
-    ? lists 
+  const filteredLists = activeCategory === 'All'
+    ? lists
     : lists.filter(l => l.category === activeCategory)
-    
+
   const activeCount = lists.filter(l => l.enabled).length
   const totalDomains = lists.filter(l => l.enabled).reduce((sum, l) => sum + l.domains, 0)
 
@@ -154,8 +166,8 @@ export default function Blocklists() {
         <div className="udash__sidebar-logo" onClick={() => navigate('/')}>
           <div className="udash__sidebar-logo-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2L4 5.5V11c0 4.5 3.4 8.7 8 9.9 4.6-1.2 8-5.4 8-9.9V5.5L12 2z" fill="var(--green)"/>
-              <path d="M9 12l2 2 4-4" stroke="#080c0a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M12 2L4 5.5V11c0 4.5 3.4 8.7 8 9.9 4.6-1.2 8-5.4 8-9.9V5.5L12 2z" fill="var(--green)" />
+              <path d="M9 12l2 2 4-4" stroke="#080c0a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
           <span className="udash__sidebar-logo-text"><span>Shield</span>Block</span>
@@ -192,38 +204,19 @@ export default function Blocklists() {
                 Manage your DNS blocklist subscriptions. {activeCount} active, {totalDomains.toLocaleString()} domains.
               </p>
             </div>
-<<<<<<< HEAD
-            <div className="bl__header-actions">
-              <button className="bl__action-btn">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                  <polyline points="23 4 23 10 17 10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-                Update All
-              </button>
-              <button className="bl__action-btn bl__action-btn--primary" onClick={() => setShowAddForm(!showAddForm)}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                  <line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                  <line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                </svg>
-                Add List
-              </button>
-            </div>
-=======
-            
+
             {/* UPDATED HEADER ACTIONS */}
             <div className="bl__header-actions">
               <button className="bl__action-btn bl__action-btn--primary">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                  <polyline points="23 4 23 10 17 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <polyline points="23 4 23 10 17 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
                 Update All
               </button>
             </div>
             {/* END UPDATED HEADER ACTIONS */}
 
->>>>>>> 1913ed0f29605d1197ad2682b297afcda2bb2bfa
           </div>
 
           {/* Add Custom Blocklist Form */}
@@ -290,9 +283,9 @@ export default function Blocklists() {
 
                 <button className="bl__item-link" aria-label="Open external link">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                    <polyline points="15 3 21 3 21 9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                    <line x1="10" y1="14" x2="21" y2="3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                    <polyline points="15 3 21 3 21 9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                    <line x1="10" y1="14" x2="21" y2="3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                   </svg>
                 </button>
               </div>
