@@ -65,19 +65,14 @@ const navItems = [
 export default function Allowlist() {
   const navigate = useNavigate()
   const [entries, setEntries] = useState(initialEntries)
-<<<<<<< HEAD
-=======
   const [newDomain, setNewDomain] = useState('')
   const [newReason, setNewReason] = useState('')
->>>>>>> 01edc22 (Backend Changes:)
   const [search, setSearch] = useState('')
   const filteredEntries = entries.filter(e =>
     e.domain.toLowerCase().includes(search.toLowerCase()) ||
     e.reason.toLowerCase().includes(search.toLowerCase())
   )
 
-<<<<<<< HEAD
-=======
   const handleAdd = () => {
     if (!newDomain.trim()) return
     const entry = {
@@ -91,7 +86,6 @@ export default function Allowlist() {
     setNewReason('')
   }
 
->>>>>>> 01edc22 (Backend Changes:)
   const handleDelete = (id) => {
     setEntries(prev => prev.filter(e => e.id !== id))
   }
@@ -145,19 +139,13 @@ export default function Allowlist() {
         <div className="udash__content">
 
           {/* Page header */}
-<<<<<<< HEAD
-          <div className="al__page-header" style={{ marginBottom: '1.5rem' }}>
-=======
           <div className="al__page-header">
->>>>>>> 01edc22 (Backend Changes:)
             <h1 className="al__title">Allowlist</h1>
             <p className="al__subtitle">
               Domains on this list will never be blocked, even if they appear in a blocklist. {entries.length} entries.
             </p>
           </div>
 
-<<<<<<< HEAD
-=======
           {/* Add domain form */}
           <div className="al__add-form">
             <h3 className="al__add-form-title">Add domain to allowlist</h3>
@@ -188,7 +176,6 @@ export default function Allowlist() {
             </div>
           </div>
 
->>>>>>> 01edc22 (Backend Changes:)
           {/* Search */}
           <div className="al__search">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">

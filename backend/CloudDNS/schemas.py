@@ -43,12 +43,8 @@ class UserResponse(BaseModel):
 
 
 class CloudConfigCreate(BaseModel):
-<<<<<<< HEAD
-    filters: Dict[str, bool] # e.g. {"ads": True, "malware": True, "adult": False}
-=======
     profile_name: str = Field(min_length=1, max_length=50)
     filters: Dict[str, bool] = Field(default_factory=dict)
->>>>>>> 01edc22 (Backend Changes:)
 
 class CloudConfigResponse(BaseModel):
     filters_bitmask: int

@@ -211,18 +211,6 @@ async def create_cloud_config(
     user_id: str = Depends(get_current_user_id),
     db: Session = Depends(get_db),
 ):
-<<<<<<< HEAD
-    # Calculate bitmask based on selected filters
-    bitmask = 0
-    for f_name, is_enabled in config.filters.items():
-        if is_enabled and f_name in FILTER_MAPPING:
-            bitmask |= FILTER_MAPPING[f_name]
-            
-    # Generate 60-character secure hash (30 bytes -> 60 hex characters)
-    config_hash = secrets.token_hex(30)
-    
-    new_config = models.CloudDNSConfig(
-=======
     # Validate filter names
     invalid_filters = set(config.filters.keys()) - set(FILTER_MAPPING.keys())
     if invalid_filters:
@@ -259,28 +247,10 @@ async def create_cloud_config(
     return schemas.CloudConfigResponse(
         id=user.id,
         profile_name=config.profile_name,
->>>>>>> 01edc22 (Backend Changes:)
         filters_bitmask=bitmask,
         config_hash=user.config_hash,
         dns_url=dns_url(user.config_hash),
     )
-<<<<<<< HEAD
-    db.add(new_config)
-    
-    # Update the user's config_hash
-    user = db.query(models.User).filter(models.User.id == user_id).first()
-    if user:
-        user.config_hash = config_hash
-
-    db.commit()
-    db.refresh(new_config)
-    
-    # Return response including the full DNS URL
-    response_data = schemas.CloudConfigResponse(
-        filters_bitmask=new_config.filters_bitmask,
-        config_hash=new_config.config_hash,
-        dns_url=f"{config_hash}.shieldblock.in"
-=======
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
@@ -289,5 +259,4 @@ async def global_exception_handler(request: Request, exc: Exception):
     return JSONResponse(
         status_code=500,
         content={"detail": "Internal server error"}
->>>>>>> 01edc22 (Backend Changes:)
     )
