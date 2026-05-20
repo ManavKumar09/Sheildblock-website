@@ -142,6 +142,8 @@ If any of these commands fail, install the missing tool before proceeding.
 
 ### Start the backend
 
+Copy `backend/CloudDNS/.env.example` to `backend/CloudDNS/.env` and set your PostgreSQL connection (`POSTGRES_*` or `DATABASE_URL`).
+
 From `backend/CloudDNS` with the virtual environment active:
 
 ```bash

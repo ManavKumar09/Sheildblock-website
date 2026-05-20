@@ -6,7 +6,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-SECRET_KEY = os.getenv("SECRET_KEY", "fallback_secret")
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    raise RuntimeError("SECRET_KEY environment variable must be set")
 ALGORITHM = os.getenv("ALGORITHM", "HS256")
 
 conf = ConnectionConfig(
@@ -30,7 +32,7 @@ def create_verification_token(email: str):
 
 def create_access_token(data: dict):
     to_encode = data.copy()
-    expire = datetime.utcnow() + timedelta(days=7) # Access token valid for 7 days
+    expire = datetime.utcnow() + timedelta(hours=1)  # Access token valid for 1 hour
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
@@ -44,7 +46,8 @@ def decode_verification_token(token: str):
         return None
 
 async def send_verification_email(email: str, token: str):
-    verification_link = f"http://localhost:5173/verify?token={token}"
+    FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
+    verification_link = f"{FRONTEND_URL}/verify?token={token}"
     html = f"""
     <p>Welcome to ShieldBlock!</p>
     <p>Please click the link below to verify your email address:</p>
@@ -57,7 +60,7 @@ async def send_verification_email(email: str, token: str):
     print(f"Verification Link: {verification_link}")
     print(f"=============================\n")
 
-    if os.getenv("MAIL_USERNAME") and os.getenv("MAIL_USERNAME") != "your_test_email@gmail.com":
+    if os.getenv("MAIL_USERNAME") != "tester":
         message = MessageSchema(
             subject="ShieldBlock - Verify your Email",
             recipients=[email],

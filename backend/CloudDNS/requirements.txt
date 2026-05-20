@@ -1,6 +1,7 @@
 fastapi
 uvicorn
 sqlalchemy
+psycopg2-binary
 pydantic
 pydantic-settings
 email-validator
@@ -9,3 +10,5 @@ python-jose[cryptography]
 fastapi-mail
 python-dotenv
 slowapi
+valkey
+limits

@@ -61,6 +61,12 @@ export default function Settings() {
 
   const [dnsFiltering, setDnsFiltering] = useState(true)
   const [dnssec, setDnssec] = useState(true)
+<<<<<<< HEAD
+=======
+  const [rateLimiting, setRateLimiting] = useState(true)
+  const [blockingMode, setBlockingMode] = useState('null')
+  const [queryLogging, setQueryLogging] = useState(true)
+>>>>>>> 01edc22 (Backend Changes:)
   const [anonymizeLogs, setAnonymizeLogs] = useState(false)
   const [logRetention, setLogRetention] = useState(localStorage.getItem('logRetention') || '7')
   const [pushNotifications, setPushNotifications] = useState(true)
@@ -164,6 +170,30 @@ export default function Settings() {
               </div>
               <Toggle value={dnssec} onChange={setDnssec} />
             </div>
+<<<<<<< HEAD
+=======
+
+            <div className="st__row">
+              <div className="st__row-info">
+                <span className="st__row-label">Rate Limiting</span>
+                <span className="st__row-desc">Prevent DNS query flooding from misbehaving clients.</span>
+              </div>
+              <Toggle value={rateLimiting} onChange={setRateLimiting} />
+            </div>
+
+            <div className="st__row">
+              <div className="st__row-info">
+                <span className="st__row-label">Blocking Mode</span>
+                <span className="st__row-desc">How ShieldBlock responds to blocked queries.</span>
+              </div>
+              <select className="st__select" value={blockingMode} onChange={(e) => setBlockingMode(e.target.value)}>
+                <option value="null">Null response (0.0.0.0)</option>
+                <option value="nxdomain">NXDOMAIN</option>
+                <option value="refused">REFUSED</option>
+                <option value="custom">Custom IP</option>
+              </select>
+            </div>
+>>>>>>> 01edc22 (Backend Changes:)
           </div>
 
           {/* ── Logging ── */}
@@ -180,6 +210,17 @@ export default function Settings() {
 
             <div className="st__row">
               <div className="st__row-info">
+<<<<<<< HEAD
+=======
+                <span className="st__row-label">Query Logging</span>
+                <span className="st__row-desc">Log all DNS queries for analytics and debugging.</span>
+              </div>
+              <Toggle value={queryLogging} onChange={setQueryLogging} />
+            </div>
+
+            <div className="st__row">
+              <div className="st__row-info">
+>>>>>>> 01edc22 (Backend Changes:)
                 <span className="st__row-label">Anonymize Logs</span>
                 <span className="st__row-desc">Mask client IP addresses in logs for additional privacy.</span>
               </div>
@@ -200,7 +241,11 @@ export default function Settings() {
                 <option value="7">7 days</option>
                 <option value="14">14 days</option>
                 <option value="30">30 days</option>
+<<<<<<< HEAD
                 <option value="60">60 days</option>
+=======
+                <option value="90">90 days</option>
+>>>>>>> 01edc22 (Backend Changes:)
               </select>
             </div>
           </div>
@@ -318,6 +363,23 @@ export default function Settings() {
 
             <div className="st__row">
               <div className="st__row-info">
+<<<<<<< HEAD
+=======
+                <span className="st__row-label">Flush DNS Cache</span>
+                <span className="st__row-desc">Clear all cached DNS responses.</span>
+              </div>
+              <button className="st__action-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <polyline points="23 4 23 10 17 10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+                Flush
+              </button>
+            </div>
+
+            <div className="st__row">
+              <div className="st__row-info">
+>>>>>>> 01edc22 (Backend Changes:)
                 <span className="st__row-label st__row-label--danger">Delete All Data</span>
                 <span className="st__row-desc">Permanently delete all logs, settings, and blocklists.</span>
               </div>

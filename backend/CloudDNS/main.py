@@ -1,163 +1,217 @@
-# import os
-import secrets
-from fastapi import FastAPI, Depends, HTTPException, status, Request, BackgroundTasks
+from contextlib import asynccontextmanager
+import logging
+import os
+
+from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, Request, status
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
-from jose import jwt, JWTError
-from slowapi import Limiter, _rate_limit_exceeded_handler
+from jose import JWTError, jwt
+from sqlalchemy.orm import Session
+
+from slowapi import Limiter
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
-from sqlalchemy.orm import Session
-from db import SessionLocal, engine, Base, get_db
-import models
+from slowapi.middleware import SlowAPIMiddleware
+from slowapi.extension import _rate_limit_exceeded_handler
+
+import cache
 import schemas
 import users
-from email_utils import create_verification_token, send_verification_email, decode_verification_token, create_access_token
+from db import Base, engine, get_db
+from email_utils import (
+    ALGORITHM,
+    SECRET_KEY,
+    create_access_token,
+    create_verification_token,
+    decode_verification_token,
+    send_verification_email,
+)
 
-# Create the database tables
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s %(message)s"
+)
+
+logger = logging.getLogger(__name__)
+
 Base.metadata.create_all(bind=engine)
 
-# Development mode flag: auto-seed a verified dev user and skip email verification during development.
-# DEV_MODE = os.getenv("DEV_MODE", "false").lower() in ("1", "true", "yes")
-# DEV_USER_EMAIL = os.getenv("DEV_USER_EMAIL", "dev@shieldblock.local")
-# DEV_USER_PASSWORD = os.getenv("DEV_USER_PASSWORD", "devpass")
-# DEV_USER_NAME = os.getenv("DEV_USER_NAME", "Developer")
+FILTER_MAPPING = {
+    "ads": 1,
+    "malware": 2,
+    "adult": 4,
+    "tracking": 8,
+    "phishing": 16,
+    "social": 32,
+}
+
+DEFAULT_BITMASK = sum(FILTER_MAPPING.values())
+DNS_HOST_SUFFIX = "dns.shieldblock.in"
 
 
-# def ensure_dev_user():
-#     if not DEV_MODE:
-#         return
-
-#     with SessionLocal() as db:
-#         dev_user = users.get_user_by_email(db, email=DEV_USER_EMAIL)
-#         if not dev_user:
-#             dev_user_payload = schemas.UserCreate(
-#                 name=DEV_USER_NAME,
-#                 email=DEV_USER_EMAIL,
-#                 password=DEV_USER_PASSWORD,
-#             )
-#             dev_user = users.create_user(db=db, user=dev_user_payload)
-
-#         if not dev_user.is_verified:
-#             users.verify_user(db, DEV_USER_EMAIL)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    cache.get_valkey()
+    yield
 
 
-# ensure_dev_user()
+app = FastAPI(title="ShieldBlock API", lifespan=lifespan)
 
-# Setup Rate Limiter (limits based on User's IP address)
-# limiter = Limiter(key_func=get_remote_address)
+ALLOWED_ORIGINS = os.getenv(
+    "CORS_ORIGINS",
+    "http://localhost:5173,http://localhost:3000"
+).split(",")
 
-app = FastAPI(title="ShieldBlock API")
+limiter = Limiter(key_func=get_remote_address)
 
-# Add Rate Limiter to app state
-# app.state.limiter = limiter
-# app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.state.limiter = limiter
 
-# Setup CORS to allow the React frontend to communicate with the backend
+app.add_exception_handler(
+    RateLimitExceeded,
+    _rate_limit_exceeded_handler
+)
+
+app.add_middleware(SlowAPIMiddleware)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000"], # Add Vite and standard React ports
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+
+
+def get_current_user_id(token: str = Depends(oauth2_scheme)):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id: str | None = payload.get("sub")
+        if user_id is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid credentials",
+            )
+        return user_id
+    except JWTError as e:
+        logger.error(f"JWT decode failed: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials",
+        )
+
+
+def filters_to_bitmask(filters: dict[str, bool]) -> int:
+    if not filters:
+        return DEFAULT_BITMASK
+    bitmask = 0
+    for name, enabled in filters.items():
+        if enabled and name in FILTER_MAPPING:
+            bitmask |= FILTER_MAPPING[name]
+    return bitmask
+
+
+def dns_url(config_hash: str) -> str:
+    return f"{config_hash}.{DNS_HOST_SUFFIX}"
+
+
+def provision_valkey_if_active(user) -> None:
+    if user.config_hash and not users.is_dns_expired(user):
+        cache.set_config_bitmask(user.config_hash, DEFAULT_BITMASK)
+
+@limiter.limit("10/minute")
 @app.post("/register", response_model=schemas.UserResponse)
-# @limiter.limit("5/minute") # Max 5 signups per minute per IP
-async def register(request: Request, user: schemas.UserCreate, db: Session = Depends(get_db), background_tasks: BackgroundTasks = None):
+async def register(
+    request: Request,
+    user: schemas.UserCreate,
+    db: Session = Depends(get_db),
+    background_tasks: BackgroundTasks = None,
+):
     db_user = users.get_user_by_email(db, email=user.email)
     if db_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
-    
+        logger.warning(f"Duplicate registration attempt: {user.email}")
+
+        raise HTTPException(
+            status_code=400,
+            detail="Email already registered"
+        )
+
     new_user = users.create_user(db=db, user=user)
-
-    # if DEV_MODE:
-    #     users.verify_user(db, new_user.email)
-    #     return new_user
-
+    logger.info(f"User registered: {new_user.email}")
     token = create_verification_token(new_user.email)
     background_tasks.add_task(send_verification_email, new_user.email, token)
-    
     return new_user
 
+@limiter.limit("10/minute")
 @app.get("/verify/{token}")
-# @limiter.limit("10/minute")
 async def verify_email(request: Request, token: str, db: Session = Depends(get_db)):
     email = decode_verification_token(token)
     if not email:
         raise HTTPException(status_code=400, detail="Invalid or expired token")
-        
+
     db_user = users.get_user_by_email(db, email=email)
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
-        
+
     if not db_user.is_verified:
-        users.verify_user(db, email)
-        
+        db_user = users.verify_user(db, email)
+    else:
+        db.refresh(db_user)
+
+    provision_valkey_if_active(db_user)
+
     access_token = create_access_token(data={"sub": db_user.id})
     return {
         "message": "Email successfully verified!",
         "access_token": access_token,
         "email": email,
-        "name": db_user.name
+        "name": db_user.name,
+        "config_hash": db_user.config_hash,
+        "dns_url": dns_url(db_user.config_hash) if db_user.config_hash else None,
     }
 
+@limiter.limit("10/minute")
 @app.post("/login", response_model=schemas.Token)
-# @limiter.limit("10/minute") # Max 10 login attempts per minute per IP to prevent brute forcing
-async def login(request: Request, user_credentials: schemas.UserLogin, db: Session = Depends(get_db)):
-    # 1. Find user by email
+async def login(
+    request: Request,
+    user_credentials: schemas.UserLogin,
+    db: Session = Depends(get_db),
+):
     user = users.get_user_by_email(db, email=user_credentials.email)
-    
-    # 2. Check if user exists and password is correct
-    if not user or not users.verify_password(user_credentials.password, user.hashed_password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, 
-            detail="Invalid email or password"
+
+    if not user or not users.verify_password(
+        user_credentials.password,
+        user.hashed_password
+    ):
+
+        logger.warning(
+            f"Invalid login attempt: {user_credentials.email}"
         )
-    
-    # 3. Check if user is verified
+
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password",
+        )
+
     if not user.is_verified:
-        # if DEV_MODE and user.email == DEV_USER_EMAIL:
-        #     users.verify_user(db, user.email)
-        # else:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Please verify your email before logging in."
+            detail="Please verify your email before logging in.",
         )
-        
-    # 4. Generate JWT Token
+
     access_token = create_access_token(data={"sub": user.id})
-    
     return {"access_token": access_token, "token_type": "bearer"}
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
-
-def get_current_user_id(token: str = Depends(oauth2_scheme)):
-    from email_utils import SECRET_KEY, ALGORITHM
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id: str = payload.get("sub")
-        if user_id is None:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
-        return user_id
-    except JWTError:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
-
-FILTER_MAPPING = {
-    "ads": 1,        # 000001
-    "malware": 2,    # 000010
-    "adult": 4,      # 000100
-    "tracking": 8,   # 001000
-    "phishing": 16,  # 010000
-    "social": 32     # 100000
-}
 
 @app.post("/api/cloud-config", response_model=schemas.CloudConfigResponse)
 async def create_cloud_config(
-    config: schemas.CloudConfigCreate, 
+    config: schemas.CloudConfigCreate,
     user_id: str = Depends(get_current_user_id),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
+<<<<<<< HEAD
     # Calculate bitmask based on selected filters
     bitmask = 0
     for f_name, is_enabled in config.filters.items():
@@ -168,9 +222,49 @@ async def create_cloud_config(
     config_hash = secrets.token_hex(30)
     
     new_config = models.CloudDNSConfig(
+=======
+    # Validate filter names
+    invalid_filters = set(config.filters.keys()) - set(FILTER_MAPPING.keys())
+    if invalid_filters:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid filter names: {', '.join(invalid_filters)}. Valid filters: {', '.join(FILTER_MAPPING.keys())}",
+        )
+
+    user = users.get_user_by_id(db, user_id)
+    if not user or not user.is_verified:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Please verify your email before updating DNS config.",
+        )
+    if not user.config_hash:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="DNS identity not provisioned.",
+        )
+    if users.is_dns_expired(user):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="DNS subscription expired",
+        )
+
+    bitmask = filters_to_bitmask(config.filters)
+    success = cache.set_config_bitmask(user.config_hash, bitmask)
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to update DNS configuration",
+        )
+
+    return schemas.CloudConfigResponse(
+        id=user.id,
+        profile_name=config.profile_name,
+>>>>>>> 01edc22 (Backend Changes:)
         filters_bitmask=bitmask,
-        config_hash=config_hash
+        config_hash=user.config_hash,
+        dns_url=dns_url(user.config_hash),
     )
+<<<<<<< HEAD
     db.add(new_config)
     
     # Update the user's config_hash
@@ -186,6 +280,14 @@ async def create_cloud_config(
         filters_bitmask=new_config.filters_bitmask,
         config_hash=new_config.config_hash,
         dns_url=f"{config_hash}.shieldblock.in"
+=======
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    logger.exception(f"Unhandled exception: {str(exc)}")
+
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Internal server error"}
+>>>>>>> 01edc22 (Backend Changes:)
     )
-    
-    return response_data

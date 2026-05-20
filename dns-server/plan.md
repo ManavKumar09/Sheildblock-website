@@ -153,7 +153,7 @@ Problems:
 
 Users authenticate via:
 
-- <unique hash>.dns.shieldblock.in
+- {config hash}.dns.shieldblock.in
 
 ### Features
 

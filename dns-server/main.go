@@ -16,7 +16,7 @@ var blocklist = map[string]bool{
 	"doubleclick.net.": true,
 }
 
-const forwardToCloudflare = "1.1.1.1:53"
+const UPSTREAM_RESOLVER = "1.1.1.1:53" // Cloudflare
 
 func normalizeDomain(name string) string {
 	n := strings.ToLower(name)
@@ -80,7 +80,7 @@ func handleDNS(w dns.ResponseWriter, r *dns.Msg) {
 
 	if len(msg.Answer) == 0 {
 		log.Println("FORWARD:", r.Question)
-		resp, err := dns.Exchange(r, forwardToCloudflare)
+		resp, err := dns.Exchange(r, UPSTREAM_RESOLVER)
 		if err != nil {
 			log.Println("UPSTREAM ERROR:", err)
 			msg.Rcode = dns.RcodeServerFailure
