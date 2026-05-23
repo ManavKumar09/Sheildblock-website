@@ -4,74 +4,94 @@ import './OnBoarding.css'
 
 /* ── Self-Hosted Steps ── */
 const SELF_STEPS = [
-  { id: 1, label: 'Flash SD Card', icon: (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-      <path d="M12 2v13M6 10l6 7 6-7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-      <path d="M3 19h18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-    </svg>
-  )},
-  { id: 2, label: 'Connect Pi', icon: (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-      <rect x="2" y="7" width="20" height="10" rx="2" stroke="currentColor" strokeWidth="1.8"/>
-      <path d="M6 11h4M6 13h2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-      <circle cx="17" cy="12" r="1.5" fill="currentColor"/>
-    </svg>
-  )},
-  { id: 3, label: 'Configure Filters', icon: (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-      <path d="M12 2L4 5.5V11c0 4.5 3.4 8.7 8 9.9 4.6-1.2 8-5.4 8-9.9V5.5L12 2z" stroke="currentColor" strokeWidth="1.8"/>
-    </svg>
-  )},
-  { id: 4, label: 'Set DNS', icon: (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-      <path d="M5 12.55a11 11 0 0 1 14.08 0" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-      <path d="M1.42 9a16 16 0 0 1 21.16 0" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-      <path d="M8.53 16.11a6 6 0 0 1 6.95 0" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-      <circle cx="12" cy="20" r="1.5" fill="currentColor"/>
-    </svg>
-  )},
-  { id: 5, label: 'Complete', icon: (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8"/>
-      <path d="M8 12l3 3 5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
-  )},
+  {
+    id: 1, label: 'Flash SD Card', icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2v13M6 10l6 7 6-7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+        <path d="M3 19h18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      </svg>
+    )
+  },
+  {
+    id: 2, label: 'Connect Pi', icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <rect x="2" y="7" width="20" height="10" rx="2" stroke="currentColor" strokeWidth="1.8" />
+        <path d="M6 11h4M6 13h2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        <circle cx="17" cy="12" r="1.5" fill="currentColor" />
+      </svg>
+    )
+  },
+  {
+    id: 3, label: 'Configure Filters', icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2L4 5.5V11c0 4.5 3.4 8.7 8 9.9 4.6-1.2 8-5.4 8-9.9V5.5L12 2z" stroke="currentColor" strokeWidth="1.8" />
+      </svg>
+    )
+  },
+  {
+    id: 4, label: 'Set DNS', icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <path d="M5 12.55a11 11 0 0 1 14.08 0" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        <path d="M1.42 9a16 16 0 0 1 21.16 0" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        <path d="M8.53 16.11a6 6 0 0 1 6.95 0" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        <circle cx="12" cy="20" r="1.5" fill="currentColor" />
+      </svg>
+    )
+  },
+  {
+    id: 5, label: 'Complete', icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8" />
+        <path d="M8 12l3 3 5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    )
+  },
 ]
 
 /* ── Cloud Steps ── */
 const CLOUD_STEPS = [
-  { id: 1, label: 'Name Your Profile', icon: (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-      <rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.8"/>
-      <path d="M7 8h10M7 12h6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-    </svg>
-  )},
-  { id: 2, label: 'Configure Filters', icon: (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-      <path d="M12 2L4 5.5V11c0 4.5 3.4 8.7 8 9.9 4.6-1.2 8-5.4 8-9.9V5.5L12 2z" stroke="currentColor" strokeWidth="1.8"/>
-    </svg>
-  )},
-  { id: 3, label: 'Setup DNS', icon: (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8"/>
-      <line x1="12" y1="3" x2="12" y2="21" stroke="currentColor" strokeWidth="1.8"/>
-      <path d="M3 12h18" stroke="currentColor" strokeWidth="1.8"/>
-      <path d="M12 3c2.5 2.5 4 5.5 4 9s-1.5 6.5-4 9" stroke="currentColor" strokeWidth="1.8"/>
-      <path d="M12 3c-2.5 2.5-4 5.5-4 9s1.5 6.5 4 9" stroke="currentColor" strokeWidth="1.8"/>
-    </svg>
-  )},
-  { id: 4, label: 'Connect Devices', icon: (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-      <rect x="5" y="2" width="14" height="20" rx="2" stroke="currentColor" strokeWidth="1.8"/>
-      <line x1="10" y1="18" x2="14" y2="18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-    </svg>
-  )},
-  { id: 5, label: 'Complete', icon: (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8"/>
-      <path d="M8 12l3 3 5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
-  )},
+  {
+    id: 1, label: 'Name Your Profile', icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" strokeWidth="1.8" />
+        <path d="M7 8h10M7 12h6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      </svg>
+    )
+  },
+  {
+    id: 2, label: 'Configure Filters', icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <path d="M12 2L4 5.5V11c0 4.5 3.4 8.7 8 9.9 4.6-1.2 8-5.4 8-9.9V5.5L12 2z" stroke="currentColor" strokeWidth="1.8" />
+      </svg>
+    )
+  },
+  {
+    id: 3, label: 'Setup DNS', icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8" />
+        <line x1="12" y1="3" x2="12" y2="21" stroke="currentColor" strokeWidth="1.8" />
+        <path d="M3 12h18" stroke="currentColor" strokeWidth="1.8" />
+        <path d="M12 3c2.5 2.5 4 5.5 4 9s-1.5 6.5-4 9" stroke="currentColor" strokeWidth="1.8" />
+        <path d="M12 3c-2.5 2.5-4 5.5-4 9s1.5 6.5 4 9" stroke="currentColor" strokeWidth="1.8" />
+      </svg>
+    )
+  },
+  {
+    id: 4, label: 'Connect Devices', icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <rect x="5" y="2" width="14" height="20" rx="2" stroke="currentColor" strokeWidth="1.8" />
+        <line x1="10" y1="18" x2="14" y2="18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      </svg>
+    )
+  },
+  {
+    id: 5, label: 'Complete', icon: (
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+        <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8" />
+        <path d="M8 12l3 3 5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    )
+  },
 ]
 
 const requirements = [
@@ -88,8 +108,8 @@ const profilePresets = [
     desc: 'Block ads and trackers for the whole family',
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-        <path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-9.5z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/>
-        <path d="M9 21v-7h6v7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M3 10.5L12 3l9 7.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-9.5z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+        <path d="M9 21v-7h6v7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
       </svg>
     ),
   },
@@ -99,8 +119,8 @@ const profilePresets = [
     desc: 'Focus mode with social media blocking',
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-        <rect x="2" y="4" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="1.8"/>
-        <path d="M8 21h8M12 17v4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+        <rect x="2" y="4" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="1.8" />
+        <path d="M8 21h8M12 17v4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
       </svg>
     ),
   },
@@ -110,8 +130,8 @@ const profilePresets = [
     desc: 'Protect your phone on any network',
     icon: (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-        <rect x="6" y="2" width="12" height="20" rx="2" stroke="currentColor" strokeWidth="1.8"/>
-        <line x1="10" y1="18" x2="14" y2="18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+        <rect x="6" y="2" width="12" height="20" rx="2" stroke="currentColor" strokeWidth="1.8" />
+        <line x1="10" y1="18" x2="14" y2="18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
       </svg>
     ),
   },
@@ -141,7 +161,7 @@ export default function Onboarding() {
     adult: false,
     social: false,
   })
-  
+
   const [dnsUrl, setDnsUrl] = useState('dns.shieldblock.org/dummy-profile')
   const [isLoading, setIsLoading] = useState(false)
   const [errorMsg, setErrorMsg] = useState('')
@@ -162,13 +182,13 @@ export default function Onboarding() {
     if (isCloud && step === 2) {
       setIsLoading(true)
       setErrorMsg('')
-      /*
+
       try {
         const response = await fetch("http://localhost:8000/api/cloud-config", {
           method: "POST",
-          headers: { 
+          headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${localStorage.getItem('token')}` 
+            "Authorization": `Bearer ${localStorage.getItem('token')}`
           },
           body: JSON.stringify({
             filters: filters
@@ -183,9 +203,9 @@ export default function Onboarding() {
       } finally {
         setIsLoading(false);
       }
-      */
+
       setTimeout(() => {
-        setDnsUrl("dns.shieldblock.org/dummy-profile");
+        setDnsUrl("dns.shieldblock.in/dummy-profile");
         setStep(step + 1);
         setIsLoading(false);
       }, 1000);
@@ -260,8 +280,8 @@ export default function Onboarding() {
         <div className="onboard__logo" onClick={() => navigate('/')}>
           <div className="onboard__logo-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2L4 5.5V11c0 4.5 3.4 8.7 8 9.9 4.6-1.2 8-5.4 8-9.9V5.5L12 2z" fill="var(--green)"/>
-              <path d="M9 12l2 2 4-4" stroke="#080c0a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M12 2L4 5.5V11c0 4.5 3.4 8.7 8 9.9 4.6-1.2 8-5.4 8-9.9V5.5L12 2z" fill="var(--green)" />
+              <path d="M9 12l2 2 4-4" stroke="#080c0a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
           <span className="onboard__logo-text"><span>Shield</span>Block</span>
@@ -273,13 +293,13 @@ export default function Onboarding() {
           <span className="onboard__mode-badge">
             {isCloud ? (
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                <path d="M18 10a6 6 0 1 0-11.8 1.5A5 5 0 1 0 7 21h11a5 5 0 0 0 0-10z" stroke="currentColor" strokeWidth="1.8"/>
+                <path d="M18 10a6 6 0 1 0-11.8 1.5A5 5 0 1 0 7 21h11a5 5 0 0 0 0-10z" stroke="currentColor" strokeWidth="1.8" />
               </svg>
             ) : (
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                <rect x="2" y="7" width="20" height="10" rx="2" stroke="currentColor" strokeWidth="1.8"/>
-                <path d="M6 11h4M6 13h2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-                <circle cx="17" cy="12" r="1.5" fill="currentColor"/>
+                <rect x="2" y="7" width="20" height="10" rx="2" stroke="currentColor" strokeWidth="1.8" />
+                <path d="M6 11h4M6 13h2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                <circle cx="17" cy="12" r="1.5" fill="currentColor" />
               </svg>
             )}
             {isCloud ? 'Cloud' : 'Self-Hosted'}
@@ -311,7 +331,7 @@ export default function Onboarding() {
             <div className="onboard__step-icon">
               {step > s.id ? (
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               ) : s.icon}
             </div>
@@ -379,11 +399,11 @@ export default function Onboarding() {
 
                 <div className="onboard__filters">
                   {[
-                    { id: 'ads',      label: 'Ads & Banners',         recommended: true,  desc: 'Block display ads, video ads, and pop-ups across all websites' },
-                    { id: 'trackers', label: 'Trackers & Analytics',  recommended: true,  desc: 'Prevent cross-site tracking, fingerprinting, and data collection scripts' },
-                    { id: 'malware',  label: 'Malware & Phishing',    recommended: true,  desc: 'Block known malicious domains and phishing attempts' },
-                    { id: 'adult',    label: 'Adult Content',         recommended: false, desc: 'Filter adult and explicit content domains (parental controls)' },
-                    { id: 'social',   label: 'Social Media Trackers', recommended: false, desc: 'Block tracking pixels from Facebook, Twitter, LinkedIn, etc.' },
+                    { id: 'ads', label: 'Ads & Banners', recommended: true, desc: 'Block display ads, video ads, and pop-ups across all websites' },
+                    { id: 'trackers', label: 'Trackers & Analytics', recommended: true, desc: 'Prevent cross-site tracking, fingerprinting, and data collection scripts' },
+                    { id: 'malware', label: 'Malware & Phishing', recommended: true, desc: 'Block known malicious domains and phishing attempts' },
+                    { id: 'adult', label: 'Adult Content', recommended: false, desc: 'Filter adult and explicit content domains (parental controls)' },
+                    { id: 'social', label: 'Social Media Trackers', recommended: false, desc: 'Block tracking pixels from Facebook, Twitter, LinkedIn, etc.' },
                   ].map((f) => (
                     <div
                       key={f.id}
@@ -410,11 +430,11 @@ export default function Onboarding() {
                     Based on your selection, ShieldBlock will use the following community-maintained blocklists:
                   </p>
                   <div className="onboard__blocklists-tags">
-                    {filters.ads      && <><span className="onboard__bl-tag">EasyList</span><span className="onboard__bl-tag">AdGuard DNS</span></>}
+                    {filters.ads && <><span className="onboard__bl-tag">EasyList</span><span className="onboard__bl-tag">AdGuard DNS</span></>}
                     {filters.trackers && <><span className="onboard__bl-tag">EasyPrivacy</span><span className="onboard__bl-tag">Fanboy Tracking</span></>}
-                    {filters.malware  && <><span className="onboard__bl-tag">URLhaus</span><span className="onboard__bl-tag">PhishTank</span></>}
-                    {filters.social   && <span className="onboard__bl-tag">Fanboy Social</span>}
-                    {filters.adult    && <span className="onboard__bl-tag">Adult DNS</span>}
+                    {filters.malware && <><span className="onboard__bl-tag">URLhaus</span><span className="onboard__bl-tag">PhishTank</span></>}
+                    {filters.social && <span className="onboard__bl-tag">Fanboy Social</span>}
+                    {filters.adult && <span className="onboard__bl-tag">Adult DNS</span>}
                   </div>
                 </div>
               </div>
@@ -442,12 +462,12 @@ export default function Onboarding() {
                       <button className="onboard__copy-btn" onClick={() => handleCopy(`https://${dnsUrl}/dns-query`, setDohCopied)}>
                         {dohCopied ? (
                           <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-                            <path d="M20 6L9 17l-5-5" stroke="var(--green)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M20 6L9 17l-5-5" stroke="var(--green)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
                         ) : (
                           <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-                            <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" strokeWidth="1.8"/>
-                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+                            <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" strokeWidth="1.8" />
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                           </svg>
                         )}
                       </button>
@@ -467,19 +487,31 @@ export default function Onboarding() {
                       <button className="onboard__copy-btn" onClick={() => handleCopy(dnsUrl, setDotCopied)}>
                         {dotCopied ? (
                           <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-                            <path d="M20 6L9 17l-5-5" stroke="var(--green)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M20 6L9 17l-5-5" stroke="var(--green)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
                         ) : (
                           <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-                            <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" strokeWidth="1.8"/>
-                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+                            <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" strokeWidth="1.8" />
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                           </svg>
                         )}
                       </button>
                     </div>
                   </div>
 
-
+                  {/* IPv4 / IPv6 */}
+                  <div className="onboard__dns-encrypted-row">
+                    <div className="onboard__dns-method-card">
+                      <h3 className="onboard__dns-method-title">IPv4 Addresses</h3>
+                      <p className="onboard__dns-ip">45.90.28.1</p>
+                      <p className="onboard__dns-ip">45.90.30.1</p>
+                    </div>
+                    <div className="onboard__dns-method-card">
+                      <h3 className="onboard__dns-method-title">IPv6 Addresses</h3>
+                      <p className="onboard__dns-ip onboard__dns-ip--green">2a07:a8c0::a1:b2c3</p>
+                      <p className="onboard__dns-ip">2a07:a8c1::a1:b2c3</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
@@ -501,8 +533,8 @@ export default function Onboarding() {
                     { name: 'Linux', desc: 'Use systemd-resolved or NetworkManager' },
                     { name: 'Router', desc: 'Set as upstream DNS in router admin' },
                   ].map((d) => (
-                    <div 
-                      key={d.name} 
+                    <div
+                      key={d.name}
                       className="onboard__connect-card"
                       onClick={() => navigate(`/onboarding/guide/${encodeURIComponent(d.name)}`)}
                       style={{ cursor: 'pointer' }}
@@ -512,8 +544,8 @@ export default function Onboarding() {
                         <p className="onboard__connect-card-desc">{d.desc}</p>
                       </div>
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="onboard__connect-card-link">
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-                        <path d="M15 3h6v6M10 14L21 3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                        <path d="M15 3h6v6M10 14L21 3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                       </svg>
                     </div>
                   ))}
@@ -526,8 +558,8 @@ export default function Onboarding() {
               <div className="onboard__body onboard__body--center">
                 <div className="onboard__complete-icon">
                   <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
-                    <circle cx="12" cy="12" r="9" stroke="var(--green)" strokeWidth="1.8"/>
-                    <path d="M8 12l3 3 5-5" stroke="var(--green)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <circle cx="12" cy="12" r="9" stroke="var(--green)" strokeWidth="1.8" />
+                    <path d="M8 12l3 3 5-5" stroke="var(--green)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </div>
 
@@ -577,16 +609,16 @@ export default function Onboarding() {
                   <div className="onboard__option-card">
                     <div className="onboard__option-icon">
                       <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                        <path d="M12 2v13M6 10l6 7 6-7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M3 19h18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+                        <path d="M12 2v13M6 10l6 7 6-7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M3 19h18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                       </svg>
                     </div>
                     <h3 className="onboard__option-title">Option A: Download Image</h3>
                     <p className="onboard__option-desc">Download the pre-built .img file and flash with your preferred tool.</p>
                     <button className="onboard__download-btn">
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                        <path d="M12 2v13M6 10l6 7 6-7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                        <path d="M3 19h18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+                        <path d="M12 2v13M6 10l6 7 6-7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                        <path d="M3 19h18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                       </svg>
                       Download .img (2.1 GB)
                     </button>
@@ -595,8 +627,8 @@ export default function Onboarding() {
                   <div className="onboard__option-card">
                     <div className="onboard__option-icon onboard__option-icon--terminal">
                       <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-                        <polyline points="4 17 10 11 4 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                        <line x1="12" y1="19" x2="20" y2="19" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+                        <polyline points="4 17 10 11 4 5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                        <line x1="12" y1="19" x2="20" y2="19" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                       </svg>
                     </div>
                     <h3 className="onboard__option-title">Option B: Install Script</h3>
@@ -606,12 +638,12 @@ export default function Onboarding() {
                       <button className="onboard__copy-btn" onClick={() => handleCopy('curl -sSL https://get.shieldblock.io | bash', setCopied)}>
                         {copied ? (
                           <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-                            <path d="M20 6L9 17l-5-5" stroke="var(--green)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M20 6L9 17l-5-5" stroke="var(--green)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
                         ) : (
                           <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-                            <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" strokeWidth="1.8"/>
-                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+                            <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" strokeWidth="1.8" />
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                           </svg>
                         )}
                       </button>
@@ -625,7 +657,7 @@ export default function Onboarding() {
                     {requirements.map((r, i) => (
                       <li key={i} className="onboard__req-item">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                          <path d="M20 6L9 17l-5-5" stroke="var(--green)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M20 6L9 17l-5-5" stroke="var(--green)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                         {r}
                       </li>
@@ -663,10 +695,10 @@ export default function Onboarding() {
                 <div className="onboard__waiting">
                   <div className="onboard__waiting-title">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                      <path d="M5 12.55a11 11 0 0 1 14.08 0" stroke="var(--green)" strokeWidth="1.8" strokeLinecap="round"/>
-                      <path d="M1.42 9a16 16 0 0 1 21.16 0" stroke="var(--green)" strokeWidth="1.8" strokeLinecap="round"/>
-                      <path d="M8.53 16.11a6 6 0 0 1 6.95 0" stroke="var(--green)" strokeWidth="1.8" strokeLinecap="round"/>
-                      <circle cx="12" cy="20" r="1.5" fill="var(--green)"/>
+                      <path d="M5 12.55a11 11 0 0 1 14.08 0" stroke="var(--green)" strokeWidth="1.8" strokeLinecap="round" />
+                      <path d="M1.42 9a16 16 0 0 1 21.16 0" stroke="var(--green)" strokeWidth="1.8" strokeLinecap="round" />
+                      <path d="M8.53 16.11a6 6 0 0 1 6.95 0" stroke="var(--green)" strokeWidth="1.8" strokeLinecap="round" />
+                      <circle cx="12" cy="20" r="1.5" fill="var(--green)" />
                     </svg>
                     Waiting for connection...
                   </div>
@@ -687,11 +719,11 @@ export default function Onboarding() {
 
                 <div className="onboard__filters">
                   {[
-                    { id: 'ads',      label: 'Ads & Banners',         recommended: true,  desc: 'Block display ads, video ads, and pop-ups across all websites' },
-                    { id: 'trackers', label: 'Trackers & Analytics',  recommended: true,  desc: 'Prevent cross-site tracking, fingerprinting, and data collection scripts' },
-                    { id: 'malware',  label: 'Malware & Phishing',    recommended: true,  desc: 'Block known malicious domains and phishing attempts' },
-                    { id: 'adult',    label: 'Adult Content',         recommended: false, desc: 'Filter adult and explicit content domains (parental controls)' },
-                    { id: 'social',   label: 'Social Media Trackers', recommended: false, desc: 'Block tracking pixels from Facebook, Twitter, LinkedIn, etc.' },
+                    { id: 'ads', label: 'Ads & Banners', recommended: true, desc: 'Block display ads, video ads, and pop-ups across all websites' },
+                    { id: 'trackers', label: 'Trackers & Analytics', recommended: true, desc: 'Prevent cross-site tracking, fingerprinting, and data collection scripts' },
+                    { id: 'malware', label: 'Malware & Phishing', recommended: true, desc: 'Block known malicious domains and phishing attempts' },
+                    { id: 'adult', label: 'Adult Content', recommended: false, desc: 'Filter adult and explicit content domains (parental controls)' },
+                    { id: 'social', label: 'Social Media Trackers', recommended: false, desc: 'Block tracking pixels from Facebook, Twitter, LinkedIn, etc.' },
                   ].map((f) => (
                     <div
                       key={f.id}
@@ -718,11 +750,11 @@ export default function Onboarding() {
                     Based on your selection, ShieldBlock will use the following community-maintained blocklists:
                   </p>
                   <div className="onboard__blocklists-tags">
-                    {filters.ads      && <><span className="onboard__bl-tag">EasyList</span><span className="onboard__bl-tag">AdGuard DNS</span></>}
+                    {filters.ads && <><span className="onboard__bl-tag">EasyList</span><span className="onboard__bl-tag">AdGuard DNS</span></>}
                     {filters.trackers && <><span className="onboard__bl-tag">EasyPrivacy</span><span className="onboard__bl-tag">Fanboy Tracking</span></>}
-                    {filters.malware  && <><span className="onboard__bl-tag">URLhaus</span><span className="onboard__bl-tag">PhishTank</span></>}
-                    {filters.social   && <span className="onboard__bl-tag">Fanboy Social</span>}
-                    {filters.adult    && <span className="onboard__bl-tag">Adult DNS</span>}
+                    {filters.malware && <><span className="onboard__bl-tag">URLhaus</span><span className="onboard__bl-tag">PhishTank</span></>}
+                    {filters.social && <span className="onboard__bl-tag">Fanboy Social</span>}
+                    {filters.adult && <span className="onboard__bl-tag">Adult DNS</span>}
                   </div>
                 </div>
               </div>
@@ -741,9 +773,9 @@ export default function Onboarding() {
                     <div className="onboard__dns-card-header">
                       <div className="onboard__dns-card-icon">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                          <rect x="2" y="7" width="20" height="10" rx="2" stroke="currentColor" strokeWidth="1.8"/>
-                          <path d="M6 11h4M6 13h2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-                          <circle cx="17" cy="12" r="1.5" fill="currentColor"/>
+                          <rect x="2" y="7" width="20" height="10" rx="2" stroke="currentColor" strokeWidth="1.8" />
+                          <path d="M6 11h4M6 13h2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                          <circle cx="17" cy="12" r="1.5" fill="currentColor" />
                         </svg>
                       </div>
                       <h3 className="onboard__dns-card-title">Router (Recommended)</h3>
@@ -758,12 +790,12 @@ export default function Onboarding() {
                         <button className="onboard__copy-btn" onClick={() => handleCopy('192.168.1.100', setDnsCopied)}>
                           {dnsCopied ? (
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-                              <path d="M20 6L9 17l-5-5" stroke="var(--green)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                              <path d="M20 6L9 17l-5-5" stroke="var(--green)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                             </svg>
                           ) : (
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-                              <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" strokeWidth="1.8"/>
-                              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+                              <rect x="9" y="9" width="13" height="13" rx="2" stroke="currentColor" strokeWidth="1.8" />
+                              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                             </svg>
                           )}
                         </button>
@@ -775,8 +807,8 @@ export default function Onboarding() {
                     <div className="onboard__dns-card-header">
                       <div className="onboard__dns-card-icon onboard__dns-card-icon--neutral">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                          <rect x="2" y="4" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="1.8"/>
-                          <path d="M8 21h8M12 17v4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+                          <rect x="2" y="4" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="1.8" />
+                          <path d="M8 21h8M12 17v4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                         </svg>
                       </div>
                       <h3 className="onboard__dns-card-title">Per Device</h3>
@@ -789,8 +821,8 @@ export default function Onboarding() {
                         <div key={device} className="onboard__device-item">
                           <span>{device}</span>
                           <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-                            <path d="M15 3h6v6M10 14L21 3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                            <path d="M15 3h6v6M10 14L21 3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
                         </div>
                       ))}
@@ -805,8 +837,8 @@ export default function Onboarding() {
               <div className="onboard__body onboard__body--center">
                 <div className="onboard__complete-icon">
                   <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
-                    <circle cx="12" cy="12" r="9" stroke="var(--green)" strokeWidth="1.8"/>
-                    <path d="M8 12l3 3 5-5" stroke="var(--green)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <circle cx="12" cy="12" r="9" stroke="var(--green)" strokeWidth="1.8" />
+                    <path d="M8 12l3 3 5-5" stroke="var(--green)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </div>
 
@@ -843,10 +875,10 @@ export default function Onboarding() {
 
       {/* ── Bottom Nav ── */}
       <div className="onboard__nav">
-        {errorMsg && <div style={{color: '#ff4d4f', marginRight: 'auto', alignSelf: 'center'}}>{errorMsg}</div>}
+        {errorMsg && <div style={{ color: '#ff4d4f', marginRight: 'auto', alignSelf: 'center' }}>{errorMsg}</div>}
         <button className="onboard__back-btn" onClick={goBack}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-            <path d="M19 12H5M11 6l-6 6 6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M19 12H5M11 6l-6 6 6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
           Back
         </button>
@@ -854,7 +886,7 @@ export default function Onboarding() {
           {isLoading ? 'Creating...' : (step === 5 ? 'Go to Dashboard' : 'Continue')}
           {!isLoading && (
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           )}
         </button>

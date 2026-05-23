@@ -204,99 +204,94 @@ export default function Blocklists() {
                 Manage your DNS blocklist subscriptions. {activeCount} active, {totalDomains.toLocaleString()} domains.
               </p>
             </div>
+            {/* UPDATED HEADER ACTIONS */}
             <div className="bl__header-actions">
-              <button className="bl__action-btn">
+              <button className="bl__action-btn bl__action-btn--primary">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                  <polyline points="23 4 23 10 17 10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                  <polyline points="23 4 23 10 17 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
                 Update All
               </button>
-              <button className="bl__action-btn bl__action-btn--primary" onClick={() => setShowAddForm(!showAddForm)}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                  <line x1="12" y1="5" x2="12" y2="19" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                  <line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                </svg>
-                Add List
-              </button>
             </div>
+            {/* END UPDATED HEADER ACTIONS */}
           </div>
 
           {/* Add Custom Blocklist Form */}
-          {showAddForm && (
-            <div className="bl__add-form">
-              <h3 className="bl__add-form-title">Add custom blocklist</h3>
-              <div className="bl__add-form-row">
-                <input
-                  type="text"
-                  className="bl__add-form-input bl__add-form-input--name"
-                  placeholder="List name"
-                  value={newListName}
-                  onChange={(e) => setNewListName(e.target.value)}
-                />
-                <input
-                  type="text"
-                  className="bl__add-form-input bl__add-form-input--url"
-                  placeholder="https://raw.githubusercontent.com/..."
-                  value={newListUrl}
-                  onChange={(e) => setNewListUrl(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleAddList()}
-                />
-                <button className="bl__add-form-submit" onClick={handleAddList}>Add</button>
-              </div>
+        {showAddForm && (
+          <div className="bl__add-form">
+            <h3 className="bl__add-form-title">Add custom blocklist</h3>
+            <div className="bl__add-form-row">
+              <input
+                type="text"
+                className="bl__add-form-input bl__add-form-input--name"
+                placeholder="List name"
+                value={newListName}
+                onChange={(e) => setNewListName(e.target.value)}
+              />
+              <input
+                type="text"
+                className="bl__add-form-input bl__add-form-input--url"
+                placeholder="https://raw.githubusercontent.com/..."
+                value={newListUrl}
+                onChange={(e) => setNewListUrl(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleAddList()}
+              />
+              <button className="bl__add-form-submit" onClick={handleAddList}>Add</button>
             </div>
-          )}
-
-          {/* Category Tabs */}
-          <div className="bl__tabs">
-            {categories.map(cat => (
-              <button
-                key={cat}
-                className={`bl__tab ${activeCategory === cat ? 'bl__tab--active' : ''}`}
-                onClick={() => setActiveCategory(cat)}
-              >
-                {cat}
-              </button>
-            ))}
           </div>
+        )}
 
-          {/* Blocklist Items */}
-          <div className="bl__list">
-            {filteredLists.map(list => (
-              <div key={list.id} className={`bl__item ${list.enabled ? 'bl__item--enabled' : ''}`}>
-                <button
-                  className={`bl__toggle ${list.enabled ? 'bl__toggle--on' : ''}`}
-                  onClick={() => toggleList(list.id)}
-                  aria-label={`Toggle ${list.name}`}
-                >
-                  <span className="bl__toggle-knob" />
-                </button>
+        {/* Category Tabs */}
+        <div className="bl__tabs">
+          {categories.map(cat => (
+            <button
+              key={cat}
+              className={`bl__tab ${activeCategory === cat ? 'bl__tab--active' : ''}`}
+              onClick={() => setActiveCategory(cat)}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
 
-                <div className="bl__item-info">
-                  <div className="bl__item-name-row">
-                    <span className="bl__item-name">{list.name}</span>
-                    <span className={`bl__item-cat bl__item-cat--${list.category.toLowerCase()}`}>
-                      {list.category}
-                    </span>
-                  </div>
-                  <span className="bl__item-meta">
-                    {list.domains.toLocaleString()} domains &nbsp;&middot;&nbsp; Updated {list.updated}
+        {/* Blocklist Items */}
+        <div className="bl__list">
+          {filteredLists.map(list => (
+            <div key={list.id} className={`bl__item ${list.enabled ? 'bl__item--enabled' : ''}`}>
+              <button
+                className={`bl__toggle ${list.enabled ? 'bl__toggle--on' : ''}`}
+                onClick={() => toggleList(list.id)}
+                aria-label={`Toggle ${list.name}`}
+              >
+                <span className="bl__toggle-knob" />
+              </button>
+
+              <div className="bl__item-info">
+                <div className="bl__item-name-row">
+                  <span className="bl__item-name">{list.name}</span>
+                  <span className={`bl__item-cat bl__item-cat--${list.category.toLowerCase()}`}>
+                    {list.category}
                   </span>
                 </div>
-
-                <button className="bl__item-link" aria-label="Open external link">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                    <polyline points="15 3 21 3 21 9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                    <line x1="10" y1="14" x2="21" y2="3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                  </svg>
-                </button>
+                <span className="bl__item-meta">
+                  {list.domains.toLocaleString()} domains &nbsp;&middot;&nbsp; Updated {list.updated}
+                </span>
               </div>
-            ))}
-          </div>
 
+              <button className="bl__item-link" aria-label="Open external link">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  <polyline points="15 3 21 3 21 9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  <line x1="10" y1="14" x2="21" y2="3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                </svg>
+              </button>
+            </div>
+          ))}
         </div>
+
       </div>
     </div>
+    </div >
   )
 }

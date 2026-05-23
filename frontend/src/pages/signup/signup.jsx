@@ -44,7 +44,7 @@ export default function Signup() {
     e.preventDefault()
     setErrorMsg('')
     setSuccessMsg('')
-    /*
+
     try {
       const response = await fetch("http://localhost:8000/register", {
         method: "POST",
@@ -53,19 +53,24 @@ export default function Signup() {
       });
       const data = await response.json();
       if (!response.ok) {
-        throw new Error(data.detail || "Registration failed");
+        let errorMessage = "Registration failed";
+        if (data.detail) {
+          errorMessage = Array.isArray(data.detail) ? data.detail[0].msg : data.detail;
+        }
+        throw new Error(errorMessage);
       }
       setSuccessMsg("Account created! Please check your email to verify and continue.");
       setStep(1.5); // New "Check your email" step
     } catch (err) {
       setErrorMsg(err.message);
     }
-    */
+    /*
     // Dummy signup logic: bypass backend and email verification
     localStorage.setItem('isLoggedIn', 'true')
     localStorage.setItem('userName', form.email)
     localStorage.setItem('token', 'dummy-token-for-dev')
     setStep(2)
+    */
 
   }
 
@@ -80,7 +85,7 @@ export default function Signup() {
     e.preventDefault()
     setErrorMsg('')
     setSuccessMsg('')
-    /*
+
     try {
       const response = await fetch("http://localhost:8000/login", {
         method: "POST",
@@ -89,7 +94,19 @@ export default function Signup() {
       });
       const data = await response.json();
       if (!response.ok) {
-        throw new Error(data.detail || "Login failed");
+        let errorMessage = "Login failed";
+        if (data.detail) {
+          errorMessage = Array.isArray(data.detail) ? data.detail[0].msg : data.detail;
+        }
+        
+        // If they are unverified, switch to the "Check Email" screen (step 1.5)
+        if (errorMessage.includes("verify your email")) {
+          setIsSignIn(false);
+          setStep(1.5);
+          return;
+        }
+        
+        throw new Error(errorMessage);
       }
       localStorage.setItem('isLoggedIn', 'true')
       localStorage.setItem('userName', form.email)
@@ -98,13 +115,14 @@ export default function Signup() {
     } catch (err) {
       setErrorMsg(err.message);
     }
-      */
 
+    /*
     // Dummy signin logic: bypass backend
     localStorage.setItem('isLoggedIn', 'true')
     localStorage.setItem('userName', form.email)
     localStorage.setItem('token', 'dummy-token-for-dev')
     navigate('/dashboard')
+    */
   }
 
   return (
