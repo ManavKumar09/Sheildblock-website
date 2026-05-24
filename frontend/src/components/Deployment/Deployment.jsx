@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import './Deployment.css'
 
 const selfHostedFeatures = [
@@ -41,6 +42,7 @@ const cloudFeatures = [
 
 export default function Deployment() {
   const [active, setActive] = useState('self')
+  const navigate = useNavigate()
 
   return (
     <section className="deployment" id="deployment">
@@ -153,7 +155,7 @@ export default function Deployment() {
                 </li>
               ))}
             </ul>
-            <button className="dep-card__btn dep-card__btn--ghost">
+            <button className="dep-card__btn dep-card__btn--ghost" onClick={() => navigate('/signup')}>
               Try Cloud Free
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                 <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>

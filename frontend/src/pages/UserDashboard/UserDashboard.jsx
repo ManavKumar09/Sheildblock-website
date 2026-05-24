@@ -28,11 +28,7 @@ const navItems = [
       <path d="M12 2L4 5.5V11c0 4.5 3.4 8.7 8 9.9 4.6-1.2 8-5.4 8-9.9V5.5L12 2z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/>
     </svg>
   )},
-  { id: 'allowlist',  label: 'Allowlist',  icon: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-      <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
-  )},
+
   { id: 'domains',    label: 'Domains',    icon: (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
       <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8"/>
@@ -60,7 +56,7 @@ export default function UserDashboard() {
       setIsLoading(true);
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch("http://localhost:8000/api/dashboard/stats", {
+        const response = await fetch(`http://localhost:8000/api/dashboard/stats?days=${chartDays}`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -76,7 +72,9 @@ export default function UserDashboard() {
         setDashboardData({
           summary: data.summary,
           chartData: data.chart_data?.map(d => ({
-              time: new Date(d.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              time: chartDays === '1' 
+                ? new Date(d.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                : new Date(d.timestamp).toLocaleDateString([], { month: 'short', day: 'numeric' }),
               blocked: Number(d.blocked),
               allowed: Number(d.total) - Number(d.blocked)
           })) || [],
@@ -371,7 +369,7 @@ export default function UserDashboard() {
                 </div>
               </div>
               <div className="udash__query-list">
-                {dashboardData?.recentLogs?.map((q, i) => {
+                {dashboardData?.recentLogs?.slice(0, 7).map((q, i) => {
                   const statusStr = q.is_blocked ? 'blocked' : 'allowed';
                   const timeOnly = new Date(q.timestamp).toLocaleTimeString();
                   return (
@@ -386,6 +384,16 @@ export default function UserDashboard() {
                   </div>
                 )})}
               </div>
+              {dashboardData?.recentLogs?.length > 7 && (
+                <button 
+                  onClick={() => navigate('/dashboard/queries')}
+                  style={{ width: '100%', marginTop: '12px', padding: '8px', background: 'transparent', border: '1px solid var(--border-subtle, #2a332d)', color: 'var(--text-muted)', borderRadius: '6px', cursor: 'pointer', fontSize: '13px' }}
+                  onMouseOver={(e) => e.target.style.color = 'var(--text)'}
+                  onMouseOut={(e) => e.target.style.color = 'var(--text-muted)'}
+                >
+                  View More
+                </button>
+              )}
             </div>
 
           </div>
