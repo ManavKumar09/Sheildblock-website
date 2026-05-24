@@ -13,3 +13,4 @@ slowapi
 valkey
 limits
 redis
+clickhouse-connect

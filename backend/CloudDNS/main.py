@@ -15,6 +15,7 @@ import models
 import schemas
 import users
 from email_utils import create_verification_token, send_verification_email, decode_verification_token, create_access_token
+import analytics
 
 # Create the database tables
 Base.metadata.create_all(bind=engine)
@@ -194,3 +195,25 @@ async def create_cloud_config(
     )
     
     return response_data
+
+@app.get("/api/dashboard/stats")
+async def get_dashboard_stats(
+    user_id: str = Depends(get_current_user_id),
+    db: Session = Depends(get_db)
+):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user or not user.config_hash:
+        raise HTTPException(status_code=400, detail="No DNS configuration found for this user.")
+        
+    config_hash = user.config_hash
+    # config_hash = "a1b2c3d4e5f678901234567890123456789012345678901234567890abcd"
+    
+    return {
+        "summary": analytics.get_dashboard_summary(config_hash),
+        "top_blocked": analytics.get_top_domains(config_hash, is_blocked=True, limit=10),
+        "top_allowed": analytics.get_top_domains(config_hash, is_blocked=False, limit=10),
+        "chart_data": analytics.get_queries_over_time(config_hash),
+        "query_types": analytics.get_query_types_distribution(config_hash),
+        "recent_logs": analytics.get_recent_logs(config_hash, limit=50)
+    }
+

@@ -8,58 +8,6 @@ import {
 } from 'recharts'
 import './UserDashboard.css'
 
-const timeData = [
-  { time: '00:00', blocked: 420, allowed: 890 },
-  { time: '02:00', blocked: 380, allowed: 750 },
-  { time: '04:00', blocked: 650, allowed: 1200 },
-  { time: '06:00', blocked: 980, allowed: 1800 },
-  { time: '08:00', blocked: 1450, allowed: 2400 },
-  { time: '10:00', blocked: 1200, allowed: 2100 },
-  { time: '12:00', blocked: 1650, allowed: 2600 },
-  { time: '14:00', blocked: 1380, allowed: 2200 },
-  { time: '16:00', blocked: 1100, allowed: 1950 },
-  { time: '18:00', blocked: 890, allowed: 1600 },
-  { time: '20:00', blocked: 1050, allowed: 1800 },
-  { time: '22:00', blocked: 780, allowed: 1400 },
-]
-
-const queryTypes = [
-  { name: 'A (IPv4)', value: 58, color: '#00e676' },
-  { name: 'AAAA (IPv6)', value: 24, color: '#26c6da' },
-  { name: 'CNAME', value: 12, color: '#f5c542' },
-  { name: 'Other', value: 6, color: '#4a5e50' },
-]
-
-const topDomains = [
-  { domain: 'ads.google.com', count: 3000 },
-  { domain: 'tracking.facebook.com', count: 2400 },
-  { domain: 'analytics.tiktok.com', count: 1900 },
-  { domain: 'pixel.adsafeprotected.com', count: 1500 },
-  { domain: 'cdn.doubleclick.net', count: 1400 },
-  { domain: 'telemetry.microsoft.com', count: 1200 },
-  { domain: 'ads.yahoo.com', count: 1050 },
-  { domain: 'track.hubspot.com', count: 850 },
-]
-
-const initialQueries = [
-  { time: '14:23:05', domain: 'api.github.com',           ip: '192.168.1.42',  status: 'allowed' },
-  { time: '14:23:04', domain: 'ads.google.com',           ip: '192.168.1.15',  status: 'blocked' },
-  { time: '14:23:03', domain: 'cdn.jsdelivr.net',         ip: '192.168.1.42',  status: 'allowed' },
-  { time: '14:23:02', domain: 'tracking.facebook.com',    ip: '192.168.1.8',   status: 'blocked' },
-  { time: '14:23:01', domain: 'fonts.googleapis.com',     ip: '192.168.1.15',  status: 'allowed' },
-  { time: '14:23:00', domain: 'pixel.adsafeprotected.com',ip: '192.168.1.22',  status: 'blocked' },
-  { time: '14:22:59', domain: 'vercel.com',               ip: '192.168.1.42',  status: 'allowed' },
-  { time: '14:22:58', domain: 'analytics.tiktok.com',     ip: '192.168.1.8',   status: 'blocked' },
-]
-
-const extraQueries = [
-  { domain: 'doubleclick.net',      ip: '192.168.1.15', status: 'blocked' },
-  { domain: 'cloudflare.com',       ip: '192.168.1.42', status: 'allowed' },
-  { domain: 'adservice.google.com', ip: '192.168.1.8',  status: 'blocked' },
-  { domain: 'github.com',           ip: '192.168.1.22', status: 'allowed' },
-  { domain: 'pixel.facebook.com',   ip: '192.168.1.15', status: 'blocked' },
-]
-
 
 const navItems = [
   { id: 'overview',   label: 'Overview',   icon: (
@@ -102,21 +50,53 @@ const navItems = [
 export default function UserDashboard() {
   const navigate = useNavigate()
   const [activeNav, setActiveNav] = useState('overview')
-  const [queries, setQueries] = useState(initialQueries)
   const logRetention = localStorage.getItem('logRetention') || '7'
   const [chartDays, setChartDays] = useState(logRetention)
-  let qIndex = 0
+  const [dashboardData, setDashboardData] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      const now = new Date()
-      const timeStr = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`
-      const next = { ...extraQueries[qIndex % extraQueries.length], time: timeStr }
-      setQueries(prev => [next, ...prev.slice(0, 7)])
-      qIndex++
-    }, 3000)
-    return () => clearInterval(interval)
-  }, [])
+    const fetchDashboardData = async () => {
+      setIsLoading(true);
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch("http://localhost:8000/api/dashboard/stats", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        
+        const data = await response.json();
+        
+        if (data.detail) {
+          console.error("API Error:", data.detail);
+          return;
+        }
+
+        setDashboardData({
+          summary: data.summary,
+          chartData: data.chart_data?.map(d => ({
+              time: new Date(d.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+              blocked: Number(d.blocked),
+              allowed: Number(d.total) - Number(d.blocked)
+          })) || [],
+          queryTypes: data.query_types?.map((q, i) => ({
+              name: q.type,
+              value: Number(q.count),
+              color: ['#00e676', '#26c6da', '#f5c542', '#4a5e50', '#8a9e8f'][i % 5]
+          })) || [],
+          topBlocked: data.top_blocked?.map(d => ({ domain: d.domain, count: Number(d.count) })) || [],
+          recentLogs: data.recent_logs || []
+        });
+      } catch (error) {
+        console.error("Failed to fetch dashboard data", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, [chartDays]);
 
   const handleLogout = () => {
     localStorage.clear()
@@ -137,6 +117,18 @@ export default function UserDashboard() {
       )
     }
     return null
+  }
+
+  const renderChange = (value, invertColors = false) => {
+    if (value === undefined || value === null) return <div className="udash__stat-change">0.00%</div>;
+    const isUp = value > 0;
+    const isZero = value === 0;
+    
+    let colorClass = isZero ? '' : (isUp ? (invertColors ? 'udash__stat-change--down' : 'udash__stat-change--up') : (invertColors ? 'udash__stat-change--up' : 'udash__stat-change--down'));
+    let arrow = isZero ? '' : (isUp ? '↗' : '↘');
+    let sign = isUp ? '+' : '';
+    
+    return <div className={`udash__stat-change ${colorClass}`}>{arrow} {sign}{value.toFixed(1)}%</div>
   }
 
   return (
@@ -204,8 +196,8 @@ export default function UserDashboard() {
                   <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke="var(--text-muted)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </div>
-              <div className="udash__stat-val">34,896</div>
-              <div className="udash__stat-change udash__stat-change--up">↗ +12.5%</div>
+              <div className="udash__stat-val">{dashboardData?.summary?.total_queries?.toLocaleString() || 0}</div>
+              {renderChange(dashboardData?.summary?.total_change)}
             </div>
 
             <div className="udash__stat-card udash__stat-card--highlighted">
@@ -217,8 +209,8 @@ export default function UserDashboard() {
                   </svg>
                 </div>
               </div>
-              <div className="udash__stat-val">12,468</div>
-              <div className="udash__stat-change udash__stat-change--up">↗ +35.7%</div>
+              <div className="udash__stat-val">{dashboardData?.summary?.blocked_queries?.toLocaleString() || 0}</div>
+              {renderChange(dashboardData?.summary?.blocked_change)}
             </div>
 
             <div className="udash__stat-card">
@@ -229,8 +221,8 @@ export default function UserDashboard() {
                   <line x1="4" y1="4" x2="20" y2="20" stroke="var(--text-muted)" strokeWidth="1.8" strokeLinecap="round"/>
                 </svg>
               </div>
-              <div className="udash__stat-val">22,428</div>
-              <div className="udash__stat-change udash__stat-change--down">↘ -3.2%</div>
+              <div className="udash__stat-val">{((dashboardData?.summary?.total_queries || 0) - (dashboardData?.summary?.blocked_queries || 0)).toLocaleString()}</div>
+              {renderChange(dashboardData?.summary?.allowed_change)}
             </div>
 
             <div className="udash__stat-card">
@@ -240,8 +232,8 @@ export default function UserDashboard() {
                   <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" stroke="var(--text-muted)" strokeWidth="1.8" strokeLinejoin="round"/>
                 </svg>
               </div>
-              <div className="udash__stat-val">4.2ms</div>
-              <div className="udash__stat-change udash__stat-change--down">↘ -18%</div>
+              <div className="udash__stat-val">{dashboardData?.summary?.avg_response_ms || 0}ms</div>
+              {renderChange(dashboardData?.summary?.response_change, true)}
             </div>
           </div>
 
@@ -276,7 +268,7 @@ export default function UserDashboard() {
                 </div>
               </div>
               <ResponsiveContainer width="100%" height={240}>
-                <AreaChart data={timeData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <AreaChart data={dashboardData?.chartData || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="blockedGrad" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="5%" stopColor="#00e676" stopOpacity={0.3}/>
@@ -307,7 +299,7 @@ export default function UserDashboard() {
               <ResponsiveContainer width="100%" height={180}>
                 <PieChart>
                   <Pie
-                    data={queryTypes}
+                    data={dashboardData?.queryTypes || []}
                     cx="50%"
                     cy="50%"
                     innerRadius={55}
@@ -315,7 +307,7 @@ export default function UserDashboard() {
                     paddingAngle={3}
                     dataKey="value"
                   >
-                    {queryTypes.map((entry, index) => (
+                    {dashboardData?.queryTypes?.map((entry, index) => (
                       <Cell key={index} fill={entry.color}/>
                     ))}
                   </Pie>
@@ -323,11 +315,11 @@ export default function UserDashboard() {
                 </PieChart>
               </ResponsiveContainer>
               <div className="udash__donut-legend">
-                {queryTypes.map((q) => (
+                {dashboardData?.queryTypes?.map((q) => (
                   <div key={q.name} className="udash__donut-legend-item">
                     <span className="udash__legend-dot" style={{ background: q.color }} />
                     <span className="udash__donut-legend-label">{q.name}</span>
-                    <span className="udash__donut-legend-val">{q.value}%</span>
+                    <span className="udash__donut-legend-val">{q.value}</span>
                   </div>
                 ))}
               </div>
@@ -347,7 +339,7 @@ export default function UserDashboard() {
               </div>
               <BResponsiveContainer width="100%" height={260}>
                 <BarChart
-                  data={topDomains}
+                  data={dashboardData?.topBlocked || []}
                   layout="vertical"
                   margin={{ top: 0, right: 20, left: 10, bottom: 0 }}
                 >
@@ -379,17 +371,20 @@ export default function UserDashboard() {
                 </div>
               </div>
               <div className="udash__query-list">
-                {queries.map((q, i) => (
+                {dashboardData?.recentLogs?.map((q, i) => {
+                  const statusStr = q.is_blocked ? 'blocked' : 'allowed';
+                  const timeOnly = new Date(q.timestamp).toLocaleTimeString();
+                  return (
                   <div key={i} className="udash__query-row">
-                    <span className={`udash__query-dot ${q.status === 'blocked' ? 'udash__query-dot--blocked' : 'udash__query-dot--allowed'}`} />
-                    <span className="udash__query-time">{q.time}</span>
+                    <span className={`udash__query-dot udash__query-dot--${statusStr}`} />
+                    <span className="udash__query-time">{timeOnly}</span>
                     <span className="udash__query-domain">{q.domain}</span>
-                    <span className="udash__query-ip">{q.ip}</span>
-                    <span className={`udash__query-badge ${q.status === 'blocked' ? 'udash__query-badge--blocked' : 'udash__query-badge--allowed'}`}>
-                      {q.status}
+                    <span className="udash__query-ip">{q.record_type}</span>
+                    <span className={`udash__query-badge udash__query-badge--${statusStr}`}>
+                      {statusStr}
                     </span>
                   </div>
-                ))}
+                )})}
               </div>
             </div>
 

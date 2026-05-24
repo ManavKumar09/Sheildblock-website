@@ -15,7 +15,7 @@ def _engine_target():
             raise RuntimeError("DATABASE_URL must be a postgresql:// connection string.")
         return database_url
 
-    password = os.getenv("POSTGRES_PASSWORD")
+    password = os.environ["POSTGRES_PASSWORD"]
     if not password:
         raise RuntimeError(
             "Set POSTGRES_PASSWORD in .env, or provide DATABASE_URL."
