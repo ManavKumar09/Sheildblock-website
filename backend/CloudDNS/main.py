@@ -1,8 +1,9 @@
 # import os
 import asyncio
 import secrets
-import redis
+import cache
 from fastapi import FastAPI, Depends, HTTPException, status, Request, BackgroundTasks
+from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
@@ -16,7 +17,8 @@ import schemas
 import users
 from email_utils import create_verification_token, send_verification_email, decode_verification_token, create_access_token
 import analytics
-
+import redis.asyncio as aioredis
+import json
 # Create the database tables
 Base.metadata.create_all(bind=engine)
 
@@ -51,9 +53,6 @@ Base.metadata.create_all(bind=engine)
 # limiter = Limiter(key_func=get_remote_address)
 
 app = FastAPI(title="ShieldBlock API")
-
-# Setup Redis client for high-speed DNS configurations
-redis_client = redis.Redis(host='localhost', port=6379, decode_responses=True)
 
 # Add Rate Limiter to app state
 # app.state.limiter = limiter
@@ -112,6 +111,14 @@ async def verify_email(request: Request, token: str, db: Session = Depends(get_d
         "email": email,
         "name": db_user.name
     }
+
+@app.get("/check-verification")
+async def check_verification(email: str, db: Session = Depends(get_db)):
+    db_user = users.get_user_by_email(db, email=email)
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    return {"is_verified": db_user.is_verified}
 
 @app.post("/login", response_model=schemas.Token)
 # @limiter.limit("10/minute") # Max 10 login attempts per minute per IP to prevent brute forcing
@@ -177,8 +184,8 @@ async def create_cloud_config(
     # Generate 60-character secure hash (30 bytes -> 60 hex characters)
     config_hash = secrets.token_hex(30)
     
-    # Save the configuration to Redis instead of Postgres
-    redis_client.set(f"config:{config_hash}", bitmask)
+    # Save the configuration to Valkey using cache utility
+    cache.set_config_bitmask(config_hash, bitmask)
     
     # Update the user's config_hash in Postgres
     user = db.query(models.User).filter(models.User.id == user_id).first()
@@ -217,3 +224,72 @@ async def get_dashboard_stats(
         "recent_logs": analytics.get_recent_logs(config_hash, limit=50)
     }
 
+# The channel name where the DNS server will publish
+DNS_LOGS_CHANNEL = "live_dns_logs"
+
+def parse_binary_dns_log(payload: bytes):
+    if len(payload) < 63:
+        return None
+    try:
+        config_hash = payload[0:60].decode('utf-8')
+        is_blocked = bool(payload[60])
+        # Assuming big-endian for the 2-byte domain length. If your friend uses little-endian, change to 'little'
+        domain_length = int.from_bytes(payload[61:63], byteorder='big') 
+        domain = payload[63:63+domain_length].decode('utf-8')
+        return {
+            "config_hash": config_hash,
+            "is_blocked": is_blocked,
+            "domain": domain
+        }
+    except Exception as e:
+        print(f"Error parsing binary payload: {e}")
+        return None
+
+@app.get("/api/dashboard/live-stream")
+async def live_stream_logs(
+    request: Request,
+    user_id: str = Depends(get_current_user_id),
+    db: Session = Depends(get_db)
+    ):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not user or not user.config_hash:
+        raise HTTPException(status_code=400, detail="No DNS configuration found for this user.")
+        
+    target_config_hash = user.config_hash
+
+    async def event_generator():
+        # Create an async redis connection for this SSE stream
+        async_redis = aioredis.Redis(host='localhost', port=6379)
+        pubsub = async_redis.pubsub()
+        await pubsub.subscribe(DNS_LOGS_CHANNEL)
+        
+        try:
+            while True:
+                # Disconnect if client closes the browser/connection
+                if await request.is_disconnected():
+                    break
+                    
+                # timeout=1.0 allows the loop to check for disconnects every second
+                message = await pubsub.get_message(ignore_subscribe_messages=True, timeout=1.0)
+                if message is not None:
+                    # Message data is bytes
+                    payload = message['data']
+                    parsed = parse_binary_dns_log(payload)
+                    
+                    # Only send to frontend if the config_hash matches the current user
+                    if parsed and parsed['config_hash'] == target_config_hash:
+                        # Print to terminal for debugging
+                        print(f"[LIVE STREAM DEBUG] Emitting for user: {parsed['domain']} (Blocked: {parsed['is_blocked']})")
+                        
+                        # Format as SSE event
+                        data = json.dumps({
+                            "domain": parsed["domain"],
+                            "is_blocked": parsed["is_blocked"]
+                        })
+                        yield f"data: {data}\n\n"
+        finally:
+            await pubsub.unsubscribe(DNS_LOGS_CHANNEL)
+            await pubsub.close()
+            await async_redis.aclose()
+
+    return StreamingResponse(event_generator(), media_type="text/event-stream")

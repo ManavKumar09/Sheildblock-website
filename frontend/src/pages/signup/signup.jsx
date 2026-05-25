@@ -24,7 +24,7 @@ export default function Signup() {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
 
-  // Listens for the verification ping from the new tab
+  // Listens for the verification ping from the new tab and polls backend
   useEffect(() => {
     if (step === 1.5) {
       const handleStorageChange = (e) => {
@@ -35,10 +35,39 @@ export default function Signup() {
       };
 
       window.addEventListener('storage', handleStorageChange);
+      
+      const interval = setInterval(async () => {
+        try {
+          const res = await fetch(`http://localhost:8000/check-verification?email=${encodeURIComponent(form.email)}`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data.is_verified) {
+              // Successfully verified on another device! Login to get token and proceed.
+              const loginRes = await fetch("http://localhost:8000/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: form.email, password: form.password })
+              });
+              if (loginRes.ok) {
+                const loginData = await loginRes.json();
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('userName', form.email);
+                localStorage.setItem('token', loginData.access_token);
+                setStep(2);
+              }
+            }
+          }
+        } catch (err) {
+          console.error("Error polling verification status", err);
+        }
+      }, 3000);
 
-      return () => window.removeEventListener('storage', handleStorageChange);
+      return () => {
+        window.removeEventListener('storage', handleStorageChange);
+        clearInterval(interval);
+      };
     }
-  }, [step]);
+  }, [step, form.email, form.password]);
 
   const handleStep1 = async (e) => {
     e.preventDefault()

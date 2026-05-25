@@ -98,6 +98,83 @@ export default function UserDashboard() {
     fetchDashboardData();
   }, [chartDays]);
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+
+    const controller = new AbortController();
+
+    const connectStream = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/api/dashboard/live-stream", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+          signal: controller.signal
+        });
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder("utf-8");
+        let buffer = "";
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n\n");
+          
+          buffer = lines.pop(); // Keep incomplete message in buffer
+
+          for (const line of lines) {
+            if (line.startsWith("data: ")) {
+              const dataStr = line.substring(6);
+              try {
+                const newLog = JSON.parse(dataStr);
+                
+                const formattedLog = {
+                  timestamp: new Date().toISOString(),
+                  domain: newLog.domain,
+                  record_type: "A", // Default for live stream right now
+                  is_blocked: newLog.is_blocked
+                };
+
+                setDashboardData(prev => {
+                  if (!prev) return prev;
+                  const updatedLogs = [formattedLog, ...(prev.recentLogs || [])].slice(0, 50);
+                  
+                  const updatedSummary = { ...prev.summary };
+                  updatedSummary.total_queries = (updatedSummary.total_queries || 0) + 1;
+                  if (formattedLog.is_blocked) {
+                    updatedSummary.blocked_queries = (updatedSummary.blocked_queries || 0) + 1;
+                  }
+
+                  return {
+                    ...prev,
+                    recentLogs: updatedLogs,
+                    summary: updatedSummary
+                  };
+                });
+              } catch (e) {
+                console.error("Error parsing stream data", e);
+              }
+            }
+          }
+        }
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          console.error("Live stream error:", err);
+        }
+      }
+    };
+
+    connectStream();
+
+    return () => {
+      controller.abort();
+    };
+  }, []);
+
   const handleLogout = () => {
     localStorage.clear()
     navigate('/')
