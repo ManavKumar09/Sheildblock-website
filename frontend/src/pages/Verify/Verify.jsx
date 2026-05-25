@@ -17,7 +17,7 @@ export default function Verify() {
       try {
         const response = await fetch(`http://localhost:8000/verify/${token}`);
         const data = await response.json();
-        
+
         if (!response.ok) {
           setStatus(data.detail || 'Verification failed.');
           return;
@@ -27,17 +27,17 @@ export default function Verify() {
         localStorage.setItem('isLoggedIn', 'true');
         localStorage.setItem('userName', data.email);
         localStorage.setItem('token', data.access_token);
-        
+
         // This tiny update to localStorage acts as a ping to our original tab
         localStorage.setItem('verified_ping', Date.now().toString());
 
         setStatus('✅ Verification Successful!');
         setVerified(true);
-        
+
         // Try to close the tab automatically (Browsers usually only allow this if the script opened the tab, 
         // but it works sometimes depending on the browser settings and how the email client opened it).
         setTimeout(() => {
-            window.close();
+          window.close();
         }, 3000);
 
       } catch (error) {
@@ -53,7 +53,7 @@ export default function Verify() {
       <h1 style={{ color: 'var(--green)' }}>{status}</h1>
       {verified && (
         <p style={{ marginTop: '20px', color: '#a0a0a0', fontSize: '1.2rem', lineHeight: '1.5' }}>
-          Your account is ready. You can safely close this tab<br/>and return to your original window.
+          Your account is ready. You can safely close this tab<br />and return to your original window.
         </p>
       )}
     </div>

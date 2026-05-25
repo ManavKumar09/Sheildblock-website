@@ -30,13 +30,7 @@ const navItems = [
       </svg>
     )
   },
-  {
-    id: 'allowlist', label: 'Allowlist', icon: (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-        <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    )
-  },
+
   {
     id: 'domains', label: 'Domains', icon: (
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -179,7 +173,6 @@ export default function Settings() {
               Logging
             </div>
 
-
             <div className="st__row">
               <div className="st__row-info">
                 <span className="st__row-label">Anonymize Logs</span>
@@ -317,7 +310,6 @@ export default function Settings() {
                 Export
               </button>
             </div>
-
 
             <div className="st__row">
               <div className="st__row-info">

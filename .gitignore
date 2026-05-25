@@ -29,3 +29,4 @@ dist-ssr
 _pycache__/*
 *.db
 docs/*
+.venv/*__pycache__/

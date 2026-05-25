@@ -74,6 +74,24 @@ export default function Signup() {
     setErrorMsg('')
     setSuccessMsg('')
 
+    const pwd = form.password;
+    if (pwd.length < 8) {
+      setErrorMsg("Password must be at least 8 characters long.");
+      return;
+    }
+    if (!/[A-Z]/.test(pwd)) {
+      setErrorMsg("Password must contain at least one uppercase letter.");
+      return;
+    }
+    if (!/[a-z]/.test(pwd)) {
+      setErrorMsg("Password must contain at least one lowercase letter.");
+      return;
+    }
+    if (!/[^A-Za-z0-9]/.test(pwd)) {
+      setErrorMsg("Password must contain at least one symbol.");
+      return;
+    }
+
     try {
       const response = await fetch("http://localhost:8000/register", {
         method: "POST",
@@ -93,13 +111,13 @@ export default function Signup() {
     } catch (err) {
       setErrorMsg(err.message);
     }
-    /*
-    // Dummy signup logic: bypass backend and email verification
-    localStorage.setItem('isLoggedIn', 'true')
-    localStorage.setItem('userName', form.email)
-    localStorage.setItem('token', 'dummy-token-for-dev')
-    setStep(2)
-    */
+
+    // //Dummy signup logic: bypass backend and email verification
+    // localStorage.setItem('isLoggedIn', 'true')
+    // localStorage.setItem('userName', form.email)
+    // localStorage.setItem('token', 'dummy-token-for-dev')
+    // setStep(2)
+
 
   }
 
@@ -127,14 +145,14 @@ export default function Signup() {
         if (data.detail) {
           errorMessage = Array.isArray(data.detail) ? data.detail[0].msg : data.detail;
         }
-        
+
         // If they are unverified, switch to the "Check Email" screen (step 1.5)
         if (errorMessage.includes("verify your email")) {
           setIsSignIn(false);
           setStep(1.5);
           return;
         }
-        
+
         throw new Error(errorMessage);
       }
       localStorage.setItem('isLoggedIn', 'true')
@@ -145,317 +163,140 @@ export default function Signup() {
       setErrorMsg(err.message);
     }
 
-    /*
-    // Dummy signin logic: bypass backend
-    localStorage.setItem('isLoggedIn', 'true')
-    localStorage.setItem('userName', form.email)
-    localStorage.setItem('token', 'dummy-token-for-dev')
-    navigate('/dashboard')
-    */
+
+    //   // Dummy signin logic: bypass backend
+    //   localStorage.setItem('isLoggedIn', 'true')
+    //   localStorage.setItem('userName', form.email)
+    //   localStorage.setItem('token', 'dummy-token-for-dev')
+    //   navigate('/dashboard')
+
   }
 
-  return (
-    <div className="signup">
+    return (
+      <div className="signup">
 
-      {/* Left Panel */}
-      <div className="signup__left">
+        {/* Left Panel */}
+        <div className="signup__left">
 
-        {/* Logo */}
-        <div className="signup__logo" onClick={() => navigate('/')}>
-          <div className="signup__logo-icon">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2L4 5.5V11c0 4.5 3.4 8.7 8 9.9 4.6-1.2 8-5.4 8-9.9V5.5L12 2z" fill="var(--green)" />
-              <path d="M9 12l2 2 4-4" stroke="#080c0a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </div>
-          <span className="signup__logo-text"><span>Shield</span>Block</span>
-        </div>
-
-        {/* Stepper */}
-        {!isSignIn && (
-          <div className="signup__stepper">
-            <div className={`signup__step ${step === 1 ? 'signup__step--active' : 'signup__step--done'}`}>
-              <span className="signup__step-num">
-                {step > 1 ? (
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
-                    <path d="M20 6L9 17l-5-5" stroke="#080c0a" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                ) : '1'}
-              </span>
-              <span className="signup__step-label">Account</span>
-            </div>
-            <div className={`signup__step-line ${step > 1 ? 'signup__step-line--done' : ''}`} />
-            <div className={`signup__step ${step === 2 ? 'signup__step--active' : 'signup__step--inactive'}`}>
-              <span className="signup__step-num">2</span>
-              <span className="signup__step-label">Deployment</span>
-            </div>
-          </div>
-        )}
-
-        {/* ── STEP 1 — Account ── */}
-        {(!isSignIn && step === 1) && (
-          <>
-            <div className="signup__heading-block">
-              <h1 className="signup__heading">Create your account</h1>
-              <p className="signup__subheading">Start protecting your network in under 5 minutes.</p>
-            </div>
-
-            <div className="signup__socials">
-              <button className="signup__social-btn">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                  <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
-                  <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
-                  <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05" />
-                  <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
-                </svg>
-                Continue with Google
-              </button>
-            </div>
-
-            <div className="signup__divider"><span>OR CONTINUE WITH EMAIL</span></div>
-
-            <form className="signup__form" onSubmit={handleStep1}>
-              <div className="signup__field">
-                <label className="signup__label">Full name</label>
-                <div className="signup__input-wrap">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                    <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="1.8" />
-                    <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                  </svg>
-                  <input type="text" name="name" placeholder="Manthan Deshpande"
-                    value={form.name} onChange={handleChange} className="signup__input" required />
-                </div>
-              </div>
-
-              <div className="signup__field">
-                <label className="signup__label">Email address</label>
-                <div className="signup__input-wrap">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                    <rect x="2" y="4" width="20" height="16" rx="2" stroke="currentColor" strokeWidth="1.8" />
-                    <path d="M2 7l10 7 10-7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                  </svg>
-                  <input type="email" name="email" placeholder="you@example.com"
-                    value={form.email} onChange={handleChange} className="signup__input" required />
-                </div>
-              </div>
-
-              <div className="signup__field">
-                <label className="signup__label">Password</label>
-                <div className="signup__input-wrap">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                    <rect x="3" y="11" width="18" height="10" rx="2" stroke="currentColor" strokeWidth="1.8" />
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                  </svg>
-                  <input type={showPassword ? 'text' : 'password'} name="password"
-                    placeholder="Min. 8 characters" value={form.password} onChange={handleChange}
-                    className="signup__input" required minLength={8} />
-                  <button type="button" className="signup__eye" onClick={() => setShowPassword(!showPassword)}>
-                    {showPassword ? (
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                        <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                        <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                      </svg>
-                    ) : (
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="1.8" />
-                        <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.8" />
-                      </svg>
-                    )}
-                  </button>
-                </div>
-              </div>
-
-              <button type="submit" className="signup__submit">
-                Continue
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                  <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </button>
-            </form>
-
-            {errorMsg && (
-              <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', backgroundColor: 'rgba(255, 77, 79, 0.08)', border: '1px solid rgba(255, 77, 79, 0.2)', color: '#ff4d4f', padding: '12px 16px', borderRadius: '8px', marginTop: '16px', fontSize: '0.9rem', lineHeight: '1.4' }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0, marginTop: '1px' }}>
-                  <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
-                  <path d="M12 8v4M12 16h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                </svg>
-                <span>{errorMsg}</span>
-              </div>
-            )}
-
-            <p className="signup__signin">
-              Already have an account?{' '}
-              <span className="signup__signin-link" onClick={() => setIsSignIn(true)}>Sign in</span>
-            </p>
-            <p className="signup__terms">
-              By creating an account, you agree to our Terms of Service and Privacy Policy.
-            </p>
-          </>
-        )}
-
-        {/* ── STEP 1.5 — Check Email ── */}
-        {(!isSignIn && step === 1.5) && (
-          <div style={{ textAlign: 'center', marginTop: '40px' }}>
-            <div style={{ marginBottom: '20px' }}>
-              <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
-                <path d="M22 6C22 4.9 21.1 4 20 4H4C2.9 4 2 4.9 2 6M22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6M22 6L12 13L2 6" stroke="var(--green)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          {/* Logo */}
+          <div className="signup__logo" onClick={() => navigate('/')}>
+            <div className="signup__logo-icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2L4 5.5V11c0 4.5 3.4 8.7 8 9.9 4.6-1.2 8-5.4 8-9.9V5.5L12 2z" fill="var(--green)" />
+                <path d="M9 12l2 2 4-4" stroke="#080c0a" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
-            <h1 className="signup__heading">Check your email</h1>
-            <p className="signup__subheading" style={{ marginTop: '15px', lineHeight: '1.5' }}>
-              We've sent a verification link to <strong>{form.email}</strong>.<br />
-              Please click the link to verify your account and continue.
-            </p>
+            <span className="signup__logo-text"><span>Shield</span>Block</span>
           </div>
-        )}
 
-        {/* ── STEP 2 — Deployment ── */}
-        {(!isSignIn && step === 2) && (
-          <>
-            <div className="signup__heading-block">
-              <h1 className="signup__heading">Choose deployment</h1>
-              <p className="signup__subheading">How would you like to run ShieldBlock? You can always switch later.</p>
-            </div>
-
-            <div className="signup__deploy-options">
-
-              <div
-                className={`deploy-option ${deployment === 'cloud' ? 'deploy-option--active' : ''}`}
-                onClick={() => setDeployment('cloud')}
-              >
-                <div className="deploy-option__left">
-                  <div className="deploy-option__icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                      <path d="M18 10a6 6 0 1 0-11.8 1.5A5 5 0 1 0 7 21h11a5 5 0 0 0 0-10z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
-                    </svg>
-                  </div>
-                  <div>
-                    <div className="deploy-option__title">
-                      Cloud DNS
-                      <span className="deploy-option__badge deploy-option__badge--paid">From $3/mo</span>
-                    </div>
-                    <p className="deploy-option__desc">
-                      Use our managed cloud DNS infrastructure. Works everywhere including mobile networks and while traveling.
-                    </p>
-                    <div className="deploy-option__tags">
-                      <span className="dep-tag">Global Anycast</span>
-                      <span className="dep-tag">DoH / DoT</span>
-                      <span className="dep-tag">Mobile Ready</span>
-                    </div>
-                  </div>
-                </div>
-                {deployment === 'cloud' && (
-                  <div className="deploy-option__check">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+          {/* Stepper */}
+          {!isSignIn && (
+            <div className="signup__stepper">
+              <div className={`signup__step ${step === 1 ? 'signup__step--active' : 'signup__step--done'}`}>
+                <span className="signup__step-num">
+                  {step > 1 ? (
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none">
                       <path d="M20 6L9 17l-5-5" stroke="#080c0a" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
                     </svg>
-                  </div>
-                )}
+                  ) : '1'}
+                </span>
+                <span className="signup__step-label">Account</span>
               </div>
-
-              <div
-                className={`deploy-option ${deployment === 'self' ? 'deploy-option--active' : ''}`}
-                onClick={() => setDeployment('self')}
-              >
-                <div className="deploy-option__left">
-                  <div className="deploy-option__icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                      <rect x="2" y="7" width="20" height="10" rx="2" stroke="currentColor" strokeWidth="1.8" />
-                      <path d="M6 11h4M6 13h2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                      <circle cx="17" cy="12" r="1.5" fill="currentColor" />
-                    </svg>
-                  </div>
-                  <div>
-                    <div className="deploy-option__title">
-                      Self-Hosted
-                      <span className="deploy-option__badge deploy-option__badge--free">Free</span>
-                    </div>
-                    <p className="deploy-option__desc">
-                      Deploy on your Raspberry Pi for complete data sovereignty. Your DNS queries never leave your network.
-                    </p>
-                    <div className="deploy-option__tags">
-                      <span className="dep-tag">Raspberry Pi 3/4/5</span>
-                      <span className="dep-tag">Open Source</span>
-                      <span className="dep-tag">Zero Cloud</span>
-                    </div>
-                  </div>
-                </div>
-                {deployment === 'self' && (
-                  <div className="deploy-option__check">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                      <path d="M20 6L9 17l-5-5" stroke="#080c0a" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </div>
-                )}
+              <div className={`signup__step-line ${step > 1 ? 'signup__step-line--done' : ''}`} />
+              <div className={`signup__step ${step === 2 ? 'signup__step--active' : 'signup__step--inactive'}`}>
+                <span className="signup__step-num">2</span>
+                <span className="signup__step-label">Deployment</span>
               </div>
-
             </div>
+          )}
 
-            <button className="signup__submit" onClick={handleCreate}>
-              Create Account
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-
-            <p className="signup__signin">
-              Already have an account?{' '}
-              <span className="signup__signin-link" onClick={() => setIsSignIn(true)}>Sign in</span>
-            </p>
-          </>
-        )}
-
-        {/* ── SIGN IN ── */}
-        {isSignIn && (
-          <>
-            <div className="signup__heading-block">
-              <h1 className="signup__heading">Welcome back</h1>
-              <p className="signup__subheading">Sign in to manage your ShieldBlock network.</p>
-            </div>
-
-            <form className="signup__form" onSubmit={handleSignIn}>
-              <div className="signup__field">
-                <label className="signup__label">Email address</label>
-                <div className="signup__input-wrap">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                    <rect x="2" y="4" width="20" height="16" rx="2" stroke="currentColor" strokeWidth="1.8" />
-                    <path d="M2 7l10 7 10-7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                  </svg>
-                  <input type="email" name="email" placeholder="you@example.com"
-                    value={form.email} onChange={handleChange} className="signup__input" required />
-                </div>
+          {/* ── STEP 1 — Account ── */}
+          {(!isSignIn && step === 1) && (
+            <>
+              <div className="signup__heading-block">
+                <h1 className="signup__heading">Create your account</h1>
+                <p className="signup__subheading">Start protecting your network in under 5 minutes.</p>
               </div>
 
-              <div className="signup__field">
-                <label className="signup__label">Password</label>
-                <div className="signup__input-wrap">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                    <rect x="3" y="11" width="18" height="10" rx="2" stroke="currentColor" strokeWidth="1.8" />
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+              <div className="signup__socials">
+                <button className="signup__social-btn">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05" />
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
                   </svg>
-                  <input type={showPassword ? 'text' : 'password'} name="password"
-                    placeholder="Enter your password" value={form.password} onChange={handleChange}
-                    className="signup__input" required />
-                  <button type="button" className="signup__eye" onClick={() => setShowPassword(!showPassword)}>
-                    {showPassword ? (
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                        <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                        <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                      </svg>
-                    ) : (
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="1.8" />
-                        <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.8" />
-                      </svg>
-                    )}
-                  </button>
-                </div>
+                  Continue with Google
+                </button>
               </div>
+
+              <div className="signup__divider"><span>OR CONTINUE WITH EMAIL</span></div>
+
+              <form className="signup__form" onSubmit={handleStep1}>
+                <div className="signup__field">
+                  <label className="signup__label">Full name</label>
+                  <div className="signup__input-wrap">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                      <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="1.8" />
+                      <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                    </svg>
+                    <input type="text" name="name" placeholder="John Doe"
+                      value={form.name} onChange={handleChange} className="signup__input" required />
+                  </div>
+                </div>
+
+                <div className="signup__field">
+                  <label className="signup__label">Email address</label>
+                  <div className="signup__input-wrap">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                      <rect x="2" y="4" width="20" height="16" rx="2" stroke="currentColor" strokeWidth="1.8" />
+                      <path d="M2 7l10 7 10-7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                    </svg>
+                    <input type="email" name="email" placeholder="you@example.com"
+                      value={form.email} onChange={handleChange} className="signup__input" required />
+                  </div>
+                </div>
+
+                <div className="signup__field">
+                  <label className="signup__label">Password</label>
+                  <div className="signup__input-wrap">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                      <rect x="3" y="11" width="18" height="10" rx="2" stroke="currentColor" strokeWidth="1.8" />
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                    </svg>
+                    <input type={showPassword ? 'text' : 'password'} name="password"
+                      placeholder="Min. 8 characters" value={form.password} onChange={handleChange}
+                      className="signup__input" required minLength={8} />
+                    <button type="button" className="signup__eye" onClick={() => setShowPassword(!showPassword)}>
+                      {showPassword ? (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                          <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                          <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                        </svg>
+                      ) : (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="1.8" />
+                          <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.8" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '8px', lineHeight: '1.4' }}>
+                    Must be at least 8 characters with uppercase, lowercase, and symbols.
+                  </p>
+                </div>
+
+                <button type="submit" className="signup__submit">
+                  Continue
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+              </form>
 
               {errorMsg && (
-                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', backgroundColor: 'rgba(255, 77, 79, 0.08)', border: '1px solid rgba(255, 77, 79, 0.2)', color: '#ff4d4f', padding: '12px 16px', borderRadius: '8px', marginTop: '8px', marginBottom: '16px', fontSize: '0.9rem', lineHeight: '1.4' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', backgroundColor: 'rgba(255, 77, 79, 0.08)', border: '1px solid rgba(255, 77, 79, 0.2)', color: '#ff4d4f', padding: '12px 16px', borderRadius: '8px', marginTop: '16px', fontSize: '0.9rem', lineHeight: '1.4' }}>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0, marginTop: '1px' }}>
                     <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
                     <path d="M12 8v4M12 16h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
@@ -464,51 +305,231 @@ export default function Signup() {
                 </div>
               )}
 
-              <button type="submit" className="signup__submit">
-                Sign In
+              <p className="signup__signin">
+                Already have an account?{' '}
+                <span className="signup__signin-link" onClick={() => setIsSignIn(true)}>Sign in</span>
+              </p>
+              <p className="signup__terms">
+                By creating an account, you agree to our Terms of Service and Privacy Policy.
+              </p>
+            </>
+          )}
+
+          {/* ── STEP 1.5 — Check Email ── */}
+          {(!isSignIn && step === 1.5) && (
+            <div style={{ textAlign: 'center', marginTop: '40px' }}>
+              <div style={{ marginBottom: '20px' }}>
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none">
+                  <path d="M22 6C22 4.9 21.1 4 20 4H4C2.9 4 2 4.9 2 6M22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6M22 6L12 13L2 6" stroke="var(--green)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+              <h1 className="signup__heading">Check your email</h1>
+              <p className="signup__subheading" style={{ marginTop: '15px', lineHeight: '1.5' }}>
+                We've sent a verification link to <strong>{form.email}</strong>.<br />
+                Please click the link to verify your account and continue.
+              </p>
+            </div>
+          )}
+
+          {/* ── STEP 2 — Deployment ── */}
+          {(!isSignIn && step === 2) && (
+            <>
+              <div className="signup__heading-block">
+                <h1 className="signup__heading">Choose deployment</h1>
+                <p className="signup__subheading">How would you like to run ShieldBlock? You can always switch later.</p>
+              </div>
+
+              <div className="signup__deploy-options">
+
+                <div
+                  className={`deploy-option ${deployment === 'cloud' ? 'deploy-option--active' : ''}`}
+                  onClick={() => setDeployment('cloud')}
+                >
+                  <div className="deploy-option__left">
+                    <div className="deploy-option__icon">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <path d="M18 10a6 6 0 1 0-11.8 1.5A5 5 0 1 0 7 21h11a5 5 0 0 0 0-10z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+                      </svg>
+                    </div>
+                    <div>
+                      <div className="deploy-option__title">
+                        Cloud DNS
+                        <span className="deploy-option__badge deploy-option__badge--paid">From $3/mo</span>
+                      </div>
+                      <p className="deploy-option__desc">
+                        Use our managed cloud DNS infrastructure. Works everywhere including mobile networks and while traveling.
+                      </p>
+                      <div className="deploy-option__tags">
+                        <span className="dep-tag">Global Anycast</span>
+                        <span className="dep-tag">DoH / DoT</span>
+                        <span className="dep-tag">Mobile Ready</span>
+                      </div>
+                    </div>
+                  </div>
+                  {deployment === 'cloud' && (
+                    <div className="deploy-option__check">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                        <path d="M20 6L9 17l-5-5" stroke="#080c0a" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </div>
+                  )}
+                </div>
+
+                <div
+                  className={`deploy-option ${deployment === 'self' ? 'deploy-option--active' : ''}`}
+                  onClick={() => setDeployment('self')}
+                >
+                  <div className="deploy-option__left">
+                    <div className="deploy-option__icon">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                        <rect x="2" y="7" width="20" height="10" rx="2" stroke="currentColor" strokeWidth="1.8" />
+                        <path d="M6 11h4M6 13h2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                        <circle cx="17" cy="12" r="1.5" fill="currentColor" />
+                      </svg>
+                    </div>
+                    <div>
+                      <div className="deploy-option__title">
+                        Self-Hosted
+                        <span className="deploy-option__badge deploy-option__badge--free">Free</span>
+                      </div>
+                      <p className="deploy-option__desc">
+                        Deploy on your Raspberry Pi for complete data sovereignty. Your DNS queries never leave your network.
+                      </p>
+                      <div className="deploy-option__tags">
+                        <span className="dep-tag">Raspberry Pi 3/4/5</span>
+                        <span className="dep-tag">Open Source</span>
+                        <span className="dep-tag">Zero Cloud</span>
+                      </div>
+                    </div>
+                  </div>
+                  {deployment === 'self' && (
+                    <div className="deploy-option__check">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                        <path d="M20 6L9 17l-5-5" stroke="#080c0a" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </div>
+                  )}
+                </div>
+
+              </div>
+
+              <button className="signup__submit" onClick={handleCreate}>
+                Create Account
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                   <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </button>
-            </form>
 
-            <p className="signup__signin">
-              Don't have an account?{' '}
-              <span className="signup__signin-link" onClick={() => { setIsSignIn(false); setStep(1) }}>Create one</span>
-            </p>
-          </>
-        )}
+              <p className="signup__signin">
+                Already have an account?{' '}
+                <span className="signup__signin-link" onClick={() => setIsSignIn(true)}>Sign in</span>
+              </p>
+            </>
+          )}
 
-      </div>
+          {/* ── SIGN IN ── */}
+          {isSignIn && (
+            <>
+              <div className="signup__heading-block">
+                <h1 className="signup__heading">Welcome back</h1>
+                <p className="signup__subheading">Sign in to manage your ShieldBlock network.</p>
+              </div>
 
-      {/* Right Panel */}
-      <div className="signup__right">
-        <div className="signup__right-inner">
-          <div className="signup__right-icon">
-            <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2L4 5.5V11c0 4.5 3.4 8.7 8 9.9 4.6-1.2 8-5.4 8-9.9V5.5L12 2z" stroke="var(--green)" strokeWidth="1.8" strokeLinejoin="round" />
-              <path d="M9 12l2 2 4-4" stroke="var(--green)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </div>
-          <blockquote className="signup__quote">
-            "Block ads at the DNS level. Protect every device on your network with a single deployment."
-          </blockquote>
-          <ul className="signup__perks">
-            {perks.map((p, i) => (
-              <li key={i} className="signup__perk">
-                <span className="signup__perk-icon">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                    <path d="M20 6L9 17l-5-5" stroke="var(--green)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+              <form className="signup__form" onSubmit={handleSignIn}>
+                <div className="signup__field">
+                  <label className="signup__label">Email address</label>
+                  <div className="signup__input-wrap">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                      <rect x="2" y="4" width="20" height="16" rx="2" stroke="currentColor" strokeWidth="1.8" />
+                      <path d="M2 7l10 7 10-7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                    </svg>
+                    <input type="email" name="email" placeholder="you@example.com"
+                      value={form.email} onChange={handleChange} className="signup__input" required />
+                  </div>
+                </div>
+
+                <div className="signup__field">
+                  <label className="signup__label">Password</label>
+                  <div className="signup__input-wrap">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                      <rect x="3" y="11" width="18" height="10" rx="2" stroke="currentColor" strokeWidth="1.8" />
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                    </svg>
+                    <input type={showPassword ? 'text' : 'password'} name="password"
+                      placeholder="Enter your password" value={form.password} onChange={handleChange}
+                      className="signup__input" required />
+                    <button type="button" className="signup__eye" onClick={() => setShowPassword(!showPassword)}>
+                      {showPassword ? (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                          <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                          <line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                        </svg>
+                      ) : (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="currentColor" strokeWidth="1.8" />
+                          <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.8" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                {errorMsg && (
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', backgroundColor: 'rgba(255, 77, 79, 0.08)', border: '1px solid rgba(255, 77, 79, 0.2)', color: '#ff4d4f', padding: '12px 16px', borderRadius: '8px', marginTop: '8px', marginBottom: '16px', fontSize: '0.9rem', lineHeight: '1.4' }}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0, marginTop: '1px' }}>
+                      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
+                      <path d="M12 8v4M12 16h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                    </svg>
+                    <span>{errorMsg}</span>
+                  </div>
+                )}
+
+                <button type="submit" className="signup__submit">
+                  Sign In
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                    <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
-                </span>
-                {p}
-              </li>
-            ))}
-          </ul>
-          <p className="signup__right-footer">ShieldBlock · Network-level DNS ad blocking</p>
-        </div>
-      </div>
+                </button>
+              </form>
 
-    </div>
-  )
-}
+              <p className="signup__signin">
+                Don't have an account?{' '}
+                <span className="signup__signin-link" onClick={() => { setIsSignIn(false); setStep(1) }}>Create one</span>
+              </p>
+            </>
+          )}
+
+        </div>
+
+        {/* Right Panel */}
+        <div className="signup__right">
+          <div className="signup__right-inner">
+            <div className="signup__right-icon">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+                <path d="M12 2L4 5.5V11c0 4.5 3.4 8.7 8 9.9 4.6-1.2 8-5.4 8-9.9V5.5L12 2z" stroke="var(--green)" strokeWidth="1.8" strokeLinejoin="round" />
+                <path d="M9 12l2 2 4-4" stroke="var(--green)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <blockquote className="signup__quote">
+              "Block ads at the DNS level. Protect every device on your network with a single deployment."
+            </blockquote>
+            <ul className="signup__perks">
+              {perks.map((p, i) => (
+                <li key={i} className="signup__perk">
+                  <span className="signup__perk-icon">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                      <path d="M20 6L9 17l-5-5" stroke="var(--green)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </span>
+                  {p}
+                </li>
+              ))}
+            </ul>
+            <p className="signup__right-footer">ShieldBlock · Network-level DNS ad blocking</p>
+          </div>
+        </div>
+
+      </div>
+    )
+} 

@@ -44,11 +44,7 @@ const navItems = [
       <path d="M12 2L4 5.5V11c0 4.5 3.4 8.7 8 9.9 4.6-1.2 8-5.4 8-9.9V5.5L12 2z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round"/>
     </svg>
   )},
-  { id: 'allowlist',  label: 'Allowlist',  icon: (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-      <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
-  )},
+
   { id: 'domains',    label: 'Domains',    icon: (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
       <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8"/>

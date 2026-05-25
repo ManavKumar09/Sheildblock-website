@@ -44,13 +44,7 @@ const navItems = [
       </svg>
     )
   },
-  {
-    id: 'allowlist', label: 'Allowlist', icon: (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-        <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    )
-  },
+
   {
     id: 'domains', label: 'Domains', icon: (
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -218,80 +212,81 @@ export default function Blocklists() {
           </div>
 
           {/* Add Custom Blocklist Form */}
-        {showAddForm && (
-          <div className="bl__add-form">
-            <h3 className="bl__add-form-title">Add custom blocklist</h3>
-            <div className="bl__add-form-row">
-              <input
-                type="text"
-                className="bl__add-form-input bl__add-form-input--name"
-                placeholder="List name"
-                value={newListName}
-                onChange={(e) => setNewListName(e.target.value)}
-              />
-              <input
-                type="text"
-                className="bl__add-form-input bl__add-form-input--url"
-                placeholder="https://raw.githubusercontent.com/..."
-                value={newListUrl}
-                onChange={(e) => setNewListUrl(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleAddList()}
-              />
-              <button className="bl__add-form-submit" onClick={handleAddList}>Add</button>
+          {showAddForm && (
+            <div className="bl__add-form">
+              <h3 className="bl__add-form-title">Add custom blocklist</h3>
+              <div className="bl__add-form-row">
+                <input
+                  type="text"
+                  className="bl__add-form-input bl__add-form-input--name"
+                  placeholder="List name"
+                  value={newListName}
+                  onChange={(e) => setNewListName(e.target.value)}
+                />
+                <input
+                  type="text"
+                  className="bl__add-form-input bl__add-form-input--url"
+                  placeholder="https://raw.githubusercontent.com/..."
+                  value={newListUrl}
+                  onChange={(e) => setNewListUrl(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleAddList()}
+                />
+                <button className="bl__add-form-submit" onClick={handleAddList}>Add</button>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Category Tabs */}
-        <div className="bl__tabs">
-          {categories.map(cat => (
-            <button
-              key={cat}
-              className={`bl__tab ${activeCategory === cat ? 'bl__tab--active' : ''}`}
-              onClick={() => setActiveCategory(cat)}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-
-        {/* Blocklist Items */}
-        <div className="bl__list">
-          {filteredLists.map(list => (
-            <div key={list.id} className={`bl__item ${list.enabled ? 'bl__item--enabled' : ''}`}>
+          {/* Category Tabs */}
+          <div className="bl__tabs">
+            {categories.map(cat => (
               <button
-                className={`bl__toggle ${list.enabled ? 'bl__toggle--on' : ''}`}
-                onClick={() => toggleList(list.id)}
-                aria-label={`Toggle ${list.name}`}
+                key={cat}
+                className={`bl__tab ${activeCategory === cat ? 'bl__tab--active' : ''}`}
+                onClick={() => setActiveCategory(cat)}
               >
-                <span className="bl__toggle-knob" />
+                {cat}
               </button>
+            ))}
+          </div>
 
-              <div className="bl__item-info">
-                <div className="bl__item-name-row">
-                  <span className="bl__item-name">{list.name}</span>
-                  <span className={`bl__item-cat bl__item-cat--${list.category.toLowerCase()}`}>
-                    {list.category}
+          {/* Blocklist Items */}
+          <div className="bl__list">
+            {filteredLists.map(list => (
+              <div key={list.id} className={`bl__item ${list.enabled ? 'bl__item--enabled' : ''}`}>
+                <button
+                  className={`bl__toggle ${list.enabled ? 'bl__toggle--on' : ''}`}
+                  onClick={() => toggleList(list.id)}
+                  aria-label={`Toggle ${list.name}`}
+                >
+                  <span className="bl__toggle-knob" />
+                </button>
+
+                <div className="bl__item-info">
+                  <div className="bl__item-name-row">
+                    <span className="bl__item-name">{list.name}</span>
+                    <span className={`bl__item-cat bl__item-cat--${list.category.toLowerCase()}`}>
+                      {list.category}
+                    </span>
+                  </div>
+
+                  <span className="bl__item-meta">
+                    {list.domains.toLocaleString()} domains &nbsp;&middot;&nbsp; Updated {list.updated}
                   </span>
                 </div>
-                <span className="bl__item-meta">
-                  {list.domains.toLocaleString()} domains &nbsp;&middot;&nbsp; Updated {list.updated}
-                </span>
+
+                <button className="bl__item-link" aria-label="Open external link">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                    <polyline points="15 3 21 3 21 9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                    <line x1="10" y1="14" x2="21" y2="3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                  </svg>
+                </button>
               </div>
+            ))}
+          </div>
 
-              <button className="bl__item-link" aria-label="Open external link">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                  <polyline points="15 3 21 3 21 9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-                  <line x1="10" y1="14" x2="21" y2="3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-                </svg>
-              </button>
-            </div>
-          ))}
         </div>
-
       </div>
-    </div>
     </div >
   )
 }

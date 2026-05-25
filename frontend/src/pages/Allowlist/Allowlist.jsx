@@ -37,13 +37,7 @@ const navItems = [
       </svg>
     )
   },
-  {
-    id: 'allowlist', label: 'Allowlist', icon: (
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-        <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    )
-  },
+
   {
     id: 'domains', label: 'Domains', icon: (
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -125,7 +119,7 @@ export default function Allowlist() {
         <div className="udash__content">
 
           {/* Page header */}
-          <div className="al__page-header">
+          <div className="al__page-header" style={{ marginBottom: '1.5rem' }}>
             <h1 className="al__title">Allowlist</h1>
             <p className="al__subtitle">
               Domains on this list will never be blocked, even if they appear in a blocklist. {entries.length} entries.
