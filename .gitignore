@@ -23,10 +23,10 @@ dist-ssr
 *.sln
 *.sw?
 
-
+# Artifacts
 *.pdf
 .env
 _pycache__/*
 *.db
 docs/*
-.venv/*__pycache__/
+server*
