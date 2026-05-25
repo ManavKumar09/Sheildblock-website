@@ -259,6 +259,7 @@ func (s *DNSServer) handleConnection(conn net.Conn) {
 
 	// Process queries sequentially (Parallel processing is Phase 6)
 	for {
+		conn.SetReadDeadline(time.Now().Add(15 * time.Second))
 		// Read packet length
 		lengthBuf := make([]byte, 2)
 		if _, err := io.ReadFull(conn, lengthBuf); err != nil {
@@ -332,8 +333,8 @@ func (s *DNSServer) handleQuery(conn net.Conn, user *User, data []byte) {
 	}
 
 	// Phase 3: Direct Analytics Writes
-	// This happens inside the hot path as described in the bottleneck
-	s.analytics.Write(AnalyticsEvent{
+	// Using goroutine to avoid blocking the DNS hot path
+	go s.analytics.Write(AnalyticsEvent{
 		UserHash:  user.Hash,
 		Domain:    domain,
 		Blocked:   isBlocked,
@@ -391,16 +392,16 @@ func startMetricsServer() {
 	})
 
 	go func() {
-		log.Println("Metrics server listening on :8080")
-		if err := http.ListenAndServe(":8080", mux); err != nil {
+		log.Println("Metrics server listening on 127.0.0.1:8080")
+		if err := http.ListenAndServe("127.0.0.1:8080", mux); err != nil {
 			log.Fatalf("Metrics server failed: %v", err)
 		}
 	}()
 }
 
 func main() {
-	certFile := flag.String("tls-cert", "server.crt", "Path to the TLS certificate")
-	keyFile := flag.String("tls-key", "server.key", "Path to the TLS private key")
+	certFile := flag.String("tls-cert", "/etc/letsencrypt/live/shieldblock.in/fullchain.pem", "Path to the TLS certificate")
+	keyFile := flag.String("tls-key", "/etc/letsencrypt/live/shieldblock.in/privkey.pem", "Path to the TLS private key")
 	valkeyAddr := flag.String("valkey-addr", "127.0.0.1:6379", "Valkey server address")
 	chAddr := flag.String("clickhouse-addr", "127.0.0.1:9000", "Clickhouse server address")
 	flag.Parse()
