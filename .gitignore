@@ -31,4 +31,3 @@ dist-ssr
 docs/*
 .venv/*__pycache__/
 *.zip
-server*
