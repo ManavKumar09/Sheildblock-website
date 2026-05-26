@@ -23,7 +23,7 @@ func main() {
 	keyFile := flag.String("tls-key", "/etc/letsencrypt/live/dns.shieldblock.in/privkey.pem", "Path to the TLS private key")
 	valkeyAddr := flag.String("valkey-addr", "127.0.0.1:6379", "Valkey server address")
 	chAddr := flag.String("clickhouse-addr", "172.31.43.17:9000", "Clickhouse server address")
-	dataDir := flag.String("data-dir", "~/data", "Path to the data directory")
+	dataDir := flag.String("data-dir", "/home/ubuntu/data", "Path to the data directory")
 	flag.Parse()
 
 	// 1. Init Metrics Server
