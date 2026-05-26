@@ -22,7 +22,7 @@ def get_clickhouse_client():
         try:
             logger.info("Initializing ClickHouse connection...")
             _ch_client = clickhouse_connect.get_client(
-                host=os.getenv("CLICKHOUSE_HOST", "localhost"),
+                host=os.getenv("CLICKHOUSE_HOST", "172.31.43.17"),
                 port=int(os.getenv("CLICKHOUSE_PORT", "8123")),
                 username=os.getenv("CLICKHOUSE_USER", "default"),
                 password=os.getenv("CLICKHOUSE_PASSWORD", ""),
