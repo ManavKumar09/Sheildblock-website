@@ -32,7 +32,7 @@ func NewDB(conn driver.Conn) *DB {
             config_hash String,
             domain String,
             record_type String,
-            is_blocked UInt8,
+            is_blocked Bool,
             response_time_ms Float32,
             blocklist_name String
         ) ENGINE = MergeTree()
@@ -79,16 +79,12 @@ func (db *DB) batchWorker() {
 		}
 
 		for _, e := range buffer {
-			blockedVal := uint8(0)
-			if e.IsBlocked {
-				blockedVal = 1
-			}
 			err := batch.Append(
 				e.Timestamp,
 				e.ConfigHash,
 				e.Domain,
 				e.RecordType,
-				blockedVal,
+				e.IsBlocked,
 				e.ResponseTimeMS,
 				e.BlocklistName,
 			)
