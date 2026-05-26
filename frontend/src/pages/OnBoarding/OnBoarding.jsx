@@ -218,32 +218,27 @@ export default function Onboarding() {
       setIsLoading(true)
       setErrorMsg('')
 
-      // try {
-      //   const response = await fetch("http://localhost:8000/api/cloud-config", {
-      //     method: "POST",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //       "Authorization": `Bearer ${localStorage.getItem('token')}`
-      //     },
-      //     body: JSON.stringify({
-      //       filters: filters
-      //     })
-      //   });
-      //   const data = await response.json();
-      //   if (!response.ok) throw new Error(data.detail || "Failed to create config");
-      //   setDnsUrl(data.dns_url);
-      //   setStep(step + 1);
-      // } catch (err) {
-      //   setErrorMsg(err.message);
-      // } finally {
-      //   setIsLoading(false);
-      // }
-
-      setTimeout(() => {
-        setDnsUrl("dns.shieldblock.in/dummy-profile");
+      try {
+        const response = await fetch("http://localhost:8000/api/cloud-config", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem('token')}`
+          },
+          body: JSON.stringify({
+            profile_name: profileName || "Default Profile",
+            filters: filters
+          })
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.detail || "Failed to create config");
+        setDnsUrl(data.dns_url);
         setStep(step + 1);
+      } catch (err) {
+        setErrorMsg(err.message);
+      } finally {
         setIsLoading(false);
-      }, 1000);
+      }
       return;
     }
 

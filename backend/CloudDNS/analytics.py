@@ -1,5 +1,6 @@
 import os
 import logging
+import math
 from datetime import datetime
 import clickhouse_connect
 from dotenv import load_dotenv
@@ -134,11 +135,13 @@ def get_dashboard_summary(config_hash: str, days: int = 1) -> dict:
         if res and len(res) > 0:
             c_total = res[0][0] or 0
             c_blocked = res[0][1] or 0
-            c_avg = res[0][2] or 0
+            c_avg = res[0][2]
+            c_avg = 0 if c_avg is None or math.isnan(c_avg) else c_avg
             
             p_total = res[0][3] or 0
             p_blocked = res[0][4] or 0
-            p_avg = res[0][5] or 0
+            p_avg = res[0][5]
+            p_avg = 0 if p_avg is None or math.isnan(p_avg) else p_avg
 
             c_allowed = c_total - c_blocked
             p_allowed = p_total - p_blocked
@@ -188,16 +191,49 @@ def get_top_domains(config_hash: str, is_blocked: bool, limit: int = 10, days: i
     return [{"domain": row[0], "count": row[1]} for row in res]
 
 
+def get_all_domains_stats(config_hash: str, days: int = 7) -> list:
+    """Fetches all domains with total queries, blocked queries, and last seen timestamp."""
+    client = get_clickhouse_client()
+    if not client: 
+        return []
+    
+    query = f"""
+    SELECT 
+        domain, 
+        count(*) as total_queries, 
+        sum(cast(is_blocked as Int32)) as blocked_queries,
+        max(timestamp) as last_seen
+    FROM {os.getenv('CLICKHOUSE_DB', 'app')}.dns_logs
+    WHERE config_hash = '{config_hash}'
+      AND timestamp >= now() - INTERVAL {days} DAY
+    GROUP BY domain
+    ORDER BY total_queries DESC
+    LIMIT 1000
+    """
+    res = client.query(query).result_rows
+    return [
+        {
+            "domain": row[0],
+            "queries": row[1],
+            "blocked": row[2],
+            "status": "blocked" if row[2] > 0 and row[2] == row[1] else "allowed",
+            "lastSeen": row[3].isoformat() + "Z"
+        }
+        for row in res
+    ]
+
+
 def get_queries_over_time(config_hash: str, days: int = 1) -> list:
     """Fetches queries grouped by hour, used for drawing the main line/bar chart."""
     client = get_clickhouse_client()
     if not client: 
         return []
     
-    # Groups by hour for historical data visualization
+    # Groups by hour for 1 day, by day for multiple days
+    time_func = "toStartOfHour" if days <= 1 else "toStartOfDay"
     query = f"""
     SELECT 
-        toStartOfHour(timestamp) as time_bucket,
+        {time_func}(timestamp) as time_bucket,
         count(*) as total,
         sum(cast(is_blocked as Int32)) as blocked
     FROM {os.getenv('CLICKHOUSE_DB', 'app')}.dns_logs
@@ -209,7 +245,7 @@ def get_queries_over_time(config_hash: str, days: int = 1) -> list:
     res = client.query(query).result_rows
     return [
         {
-            "timestamp": row[0].strftime('%Y-%m-%d %H:%M:%S'), 
+            "timestamp": row[0].isoformat() + "Z", 
             "total": row[1], 
             "blocked": row[2]
         } 
@@ -217,23 +253,25 @@ def get_queries_over_time(config_hash: str, days: int = 1) -> list:
     ]
 
 
-def get_recent_logs(config_hash: str, limit: int = 50) -> list:
+def get_recent_logs(config_hash: str, limit: int = 500, days: int = None) -> list:
     """Fetches the raw most recent queries. Used for the real-time/recent activity table."""
     client = get_clickhouse_client()
     if not client: 
         return []
     
+    time_filter = f"AND timestamp >= now() - INTERVAL {days} DAY" if days else ""
     query = f"""
     SELECT timestamp, domain, record_type, is_blocked, blocklist_name, response_time_ms
     FROM {os.getenv('CLICKHOUSE_DB', 'app')}.dns_logs
     WHERE config_hash = '{config_hash}'
+      {time_filter}
     ORDER BY timestamp DESC
     LIMIT {limit}
     """
     res = client.query(query).result_rows
     return [
         {
-            "timestamp": row[0].strftime('%Y-%m-%d %H:%M:%S'),
+            "timestamp": row[0].isoformat() + "Z",
             "domain": row[1],
             "record_type": row[2],
             "is_blocked": bool(row[3]),

@@ -26,7 +26,8 @@ dist-ssr
 
 *.pdf
 .env
-_pycache__/*
+*.pyc
 *.db
 docs/*
 .venv/*__pycache__/
+*.zip

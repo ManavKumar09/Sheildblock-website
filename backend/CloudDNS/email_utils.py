@@ -74,3 +74,49 @@ async def send_verification_email(email: str, token: str):
             print(f"Verification email actually sent to {email} via SMTP.")
         except Exception as e:
             print(f"Failed to send email to {email} via SMTP. Error: {e}")
+
+def create_reset_token(email: str):
+    expire = datetime.utcnow() + timedelta(minutes=15)
+    to_encode = {"exp": expire, "sub": email, "purpose": "reset"}
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+def decode_reset_token(token: str):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        if payload.get("purpose") != "reset":
+            return None
+        email: str = payload.get("sub")
+        return email
+    except Exception:
+        return None
+
+async def send_password_reset_email(email: str, token: str):
+    FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
+    reset_link = f"{FRONTEND_URL}/reset-password?token={token}"
+    html = f"""
+    <p>You requested a password reset for your ShieldBlock account.</p>
+    <p>Please click the link below to reset your password:</p>
+    <p><a href="{reset_link}">{reset_link}</a></p>
+    <p>If you did not request this, please ignore this email.</p>
+    """
+    
+    print(f"\n=============================")
+    print(f"Mock Password Reset Email to {email}:")
+    print(f"Reset Link: {reset_link}")
+    print(f"=============================\n")
+
+    if os.getenv("MAIL_USERNAME") != "tester":
+        message = MessageSchema(
+            subject="ShieldBlock - Password Reset",
+            recipients=[email],
+            body=html,
+            subtype=MessageType.html
+        )
+        
+        fm = FastMail(conf)
+        try:
+            await fm.send_message(message)
+            print(f"Password reset email actually sent to {email} via SMTP.")
+        except Exception as e:
+            print(f"Failed to send email to {email} via SMTP. Error: {e}")

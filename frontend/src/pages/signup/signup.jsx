@@ -485,6 +485,12 @@ export default function Signup() {
                   </div>
                 )}
 
+                <div style={{ textAlign: 'right', marginBottom: '16px' }}>
+                  <span className="signup__signin-link" style={{ fontSize: '0.85rem' }} onClick={() => navigate('/forgot-password')}>
+                    Forgot password?
+                  </span>
+                </div>
+
                 <button type="submit" className="signup__submit">
                   Sign In
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none">

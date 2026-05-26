@@ -1,26 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import DashboardTopBar from '../../components/DashboardTopBar/DashboardTopBar'
 import '../UserDashboard/UserDashboard.css'
 import './Domains.css'
 
-const domainsData = [
-  { id: 1,  domain: 'amazon.com',              lastSeen: '25m ago', queries: 4996, blocked: 0,    status: 'allowed' },
-  { id: 2,  domain: 'hubspot.com',             lastSeen: '8m ago',  queries: 4853, blocked: 0,    status: 'allowed' },
-  { id: 3,  domain: 'firebase.googleapis.com', lastSeen: '39m ago', queries: 4477, blocked: 0,    status: 'allowed' },
-  { id: 4,  domain: 'facebook.com',            lastSeen: '15m ago', queries: 4451, blocked: 0,    status: 'allowed' },
-  { id: 5,  domain: 'intercom.io',             lastSeen: '38m ago', queries: 4371, blocked: 0,    status: 'allowed' },
-  { id: 6,  domain: 'ads.google.com',          lastSeen: '2m ago',  queries: 4102, blocked: 4102, status: 'blocked' },
-  { id: 7,  domain: 'google-analytics.com',    lastSeen: '5m ago',  queries: 3890, blocked: 3890, status: 'blocked' },
-  { id: 8,  domain: 'cloudflare.com',          lastSeen: '12m ago', queries: 3654, blocked: 0,    status: 'allowed' },
-  { id: 9,  domain: 'doubleclick.net',         lastSeen: '3m ago',  queries: 3420, blocked: 3420, status: 'blocked' },
-  { id: 10, domain: 'github.com',              lastSeen: '1m ago',  queries: 3215, blocked: 0,    status: 'allowed' },
-  { id: 11, domain: 'tracking.facebook.com',   lastSeen: '7m ago',  queries: 2980, blocked: 2980, status: 'blocked' },
-  { id: 12, domain: 'cdn.jsdelivr.net',        lastSeen: '22m ago', queries: 2750, blocked: 0,    status: 'allowed' },
-  { id: 13, domain: 'pixel.adsafeprotected.com',lastSeen: '11m ago',queries: 2540, blocked: 2540, status: 'blocked' },
-  { id: 14, domain: 'fonts.googleapis.com',    lastSeen: '4m ago',  queries: 2320, blocked: 0,    status: 'allowed' },
-  { id: 15, domain: 'analytics.tiktok.com',    lastSeen: '18m ago', queries: 2100, blocked: 2100, status: 'blocked' },
-]
+
 
 const navItems = [
   { id: 'overview',   label: 'Overview',   icon: (
@@ -61,6 +45,37 @@ export default function Domains() {
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [sortBy, setSortBy] = useState('queries')
+  const [domainsData, setDomainsData] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchDomains = async () => {
+      try {
+        const token = localStorage.getItem('token')
+        const res = await fetch('http://localhost:8000/api/domains?days=7', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+        const data = await res.json()
+        if (Array.isArray(data)) {
+          setDomainsData(data)
+        }
+      } catch (err) {
+        console.error("Failed to fetch domains:", err)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    fetchDomains()
+  }, [])
+
+  const timeAgo = (dateStr) => {
+    const diff = new Date() - new Date(dateStr)
+    const mins = Math.max(0, Math.floor(diff / 60000))
+    if (mins < 60) return `${mins}m ago`
+    const hrs = Math.floor(mins / 60)
+    if (hrs < 24) return `${hrs}h ago`
+    return `${Math.floor(hrs / 24)}d ago`
+  }
 
   const filtered = domainsData
     .filter(d => {
@@ -171,8 +186,12 @@ export default function Domains() {
 
           {/* Domain list */}
           <div className="dm__list">
-            {filtered.map(d => (
-              <div key={d.id} className="dm__item">
+            {isLoading ? (
+              <div className="dm__empty">Loading domains...</div>
+            ) : filtered.length === 0 ? (
+              <div className="dm__empty">No domains found.</div>
+            ) : filtered.map((d, index) => (
+              <div key={index} className="dm__item">
                 <div className="dm__item-icon">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                     <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.5"/>
@@ -183,7 +202,7 @@ export default function Domains() {
 
                 <div className="dm__item-info">
                   <span className="dm__item-domain">{d.domain}</span>
-                  <span className="dm__item-meta">Last seen {d.lastSeen}</span>
+                  <span className="dm__item-meta">Last seen {timeAgo(d.lastSeen)}</span>
                 </div>
 
                 <div className="dm__item-right">
@@ -197,9 +216,6 @@ export default function Domains() {
                 </div>
               </div>
             ))}
-            {filtered.length === 0 && (
-              <div className="dm__empty">No domains found.</div>
-            )}
           </div>
 
         </div>

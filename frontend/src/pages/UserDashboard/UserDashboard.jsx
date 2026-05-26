@@ -69,15 +69,50 @@ export default function UserDashboard() {
           return;
         }
 
+        const fillMissingData = (backendData, days) => {
+          const filled = [];
+          const now = new Date();
+          const parsedDays = parseInt(days, 10);
+          
+          if (parsedDays === 1) {
+            for (let i = 23; i >= 0; i--) {
+              const d = new Date(now.getTime() - i * 60 * 60 * 1000);
+              const label = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+              
+              const existing = backendData.find(item => {
+                const itemDate = new Date(item.timestamp);
+                return itemDate.getHours() === d.getHours() && itemDate.getDate() === d.getDate();
+              });
+              
+              filled.push({
+                time: label,
+                blocked: existing ? Number(existing.blocked) : 0,
+                allowed: existing ? (Number(existing.total) - Number(existing.blocked)) : 0
+              });
+            }
+          } else {
+            for (let i = parsedDays - 1; i >= 0; i--) {
+              const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+              const label = d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+              
+              const existing = backendData.find(item => {
+                const itemDate = new Date(item.timestamp);
+                return itemDate.getDate() === d.getDate() && itemDate.getMonth() === d.getMonth();
+              });
+              
+              filled.push({
+                time: label,
+                blocked: existing ? Number(existing.blocked) : 0,
+                allowed: existing ? (Number(existing.total) - Number(existing.blocked)) : 0
+              });
+            }
+          }
+          return filled;
+        };
+
         setDashboardData({
           summary: data.summary,
-          chartData: data.chart_data?.map(d => ({
-              time: chartDays === '1' 
-                ? new Date(d.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                : new Date(d.timestamp).toLocaleDateString([], { month: 'short', day: 'numeric' }),
-              blocked: Number(d.blocked),
-              allowed: Number(d.total) - Number(d.blocked)
-          })) || [],
+          chartData: fillMissingData(data.chart_data || [], chartDays),
           queryTypes: data.query_types?.map((q, i) => ({
               name: q.type,
               value: Number(q.count),
@@ -138,17 +173,24 @@ export default function UserDashboard() {
                 };
 
                 setDashboardData(prev => {
-                  if (!prev) return prev;
-                  const updatedLogs = [formattedLog, ...(prev.recentLogs || [])].slice(0, 50);
+                  const state = prev || {
+                    summary: { total_queries: 0, blocked_queries: 0, avg_response_ms: 0 },
+                    recentLogs: [],
+                    chartData: [],
+                    queryTypes: [],
+                    topBlocked: []
+                  };
+
+                  const updatedLogs = [formattedLog, ...(state.recentLogs || [])].slice(0, 50);
                   
-                  const updatedSummary = { ...prev.summary };
+                  const updatedSummary = { ...state.summary };
                   updatedSummary.total_queries = (updatedSummary.total_queries || 0) + 1;
                   if (formattedLog.is_blocked) {
                     updatedSummary.blocked_queries = (updatedSummary.blocked_queries || 0) + 1;
                   }
 
                   return {
-                    ...prev,
+                    ...state,
                     recentLogs: updatedLogs,
                     summary: updatedSummary
                   };
@@ -342,25 +384,31 @@ export default function UserDashboard() {
                   </span>
                 </div>
               </div>
-              <ResponsiveContainer width="100%" height={240}>
-                <AreaChart data={dashboardData?.chartData || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                  <defs>
-                    <linearGradient id="blockedGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#00e676" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#00e676" stopOpacity={0}/>
-                    </linearGradient>
-                    <linearGradient id="allowedGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#26c6da" stopOpacity={0.2}/>
-                      <stop offset="95%" stopColor="#26c6da" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <XAxis dataKey="time" tick={{ fill: '#4a5e50', fontSize: 11 }} axisLine={false} tickLine={false}/>
-                  <YAxis tick={{ fill: '#4a5e50', fontSize: 11 }} axisLine={false} tickLine={false}/>
-                  <Tooltip content={<CustomTooltip />}/>
-                  <Area type="monotone" dataKey="allowed" stroke="#26c6da" strokeWidth={2} fill="url(#allowedGrad)" name="Allowed"/>
-                  <Area type="monotone" dataKey="blocked" stroke="#00e676" strokeWidth={2} fill="url(#blockedGrad)" name="Blocked"/>
-                </AreaChart>
-              </ResponsiveContainer>
+              {(!dashboardData?.chartData || dashboardData.chartData.every(d => d.allowed === 0 && d.blocked === 0)) ? (
+                <div style={{ height: 240, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
+                  No data available for this period.
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height={240}>
+                  <AreaChart data={dashboardData?.chartData || []} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="blockedGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#00e676" stopOpacity={0.3}/>
+                        <stop offset="95%" stopColor="#00e676" stopOpacity={0}/>
+                      </linearGradient>
+                      <linearGradient id="allowedGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#26c6da" stopOpacity={0.2}/>
+                        <stop offset="95%" stopColor="#26c6da" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <XAxis dataKey="time" tick={{ fill: '#4a5e50', fontSize: 11 }} axisLine={false} tickLine={false}/>
+                    <YAxis tick={{ fill: '#4a5e50', fontSize: 11 }} axisLine={false} tickLine={false}/>
+                    <Tooltip content={<CustomTooltip />}/>
+                    <Area type="monotone" dataKey="allowed" stroke="#26c6da" strokeWidth={2} fill="url(#allowedGrad)" name="Allowed"/>
+                    <Area type="monotone" dataKey="blocked" stroke="#00e676" strokeWidth={2} fill="url(#blockedGrad)" name="Blocked"/>
+                  </AreaChart>
+                </ResponsiveContainer>
+              )}
             </div>
 
             {/* Donut chart */}
@@ -412,22 +460,24 @@ export default function UserDashboard() {
                   <p className="udash__chart-sub">Most frequently blocked today</p>
                 </div>
               </div>
-              <BResponsiveContainer width="100%" height={260}>
-                <BarChart
-                  data={dashboardData?.topBlocked || []}
-                  layout="vertical"
-                  margin={{ top: 0, right: 20, left: 10, bottom: 0 }}
-                >
-                  <BXAxis type="number" tick={{ fill: '#4a5e50', fontSize: 11 }} axisLine={false} tickLine={false}/>
-                  <BYAxis type="category" dataKey="domain" tick={{ fill: '#8a9e8f', fontSize: 11 }} axisLine={false} tickLine={false} width={180}/>
-                  <BTooltip
-                    cursor={{ fill: 'rgba(0,230,118,0.05)' }}
-                    contentStyle={{ background: '#0e1410', border: '1px solid rgba(0,230,118,0.15)', borderRadius: 8, fontSize: 12 }}
-                    labelStyle={{ color: '#f0f4f1' }}
-                  />
-                  <Bar dataKey="count" fill="#00e676" radius={[0, 4, 4, 0]} name="Blocked"/>
-                </BarChart>
-              </BResponsiveContainer>
+              <div style={{ flex: 1, minHeight: 260 }}>
+                <BResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={dashboardData?.topBlocked || []}
+                    layout="vertical"
+                    margin={{ top: 0, right: 20, left: 10, bottom: 0 }}
+                  >
+                    <BXAxis type="number" tick={{ fill: '#4a5e50', fontSize: 11 }} axisLine={false} tickLine={false}/>
+                    <BYAxis type="category" dataKey="domain" tick={{ fill: '#8a9e8f', fontSize: 11 }} axisLine={false} tickLine={false} width={180}/>
+                    <BTooltip
+                      cursor={{ fill: 'rgba(0,230,118,0.05)' }}
+                      contentStyle={{ background: '#0e1410', border: '1px solid rgba(0,230,118,0.15)', borderRadius: 8, fontSize: 12 }}
+                      labelStyle={{ color: '#f0f4f1' }}
+                    />
+                    <Bar dataKey="count" fill="#00e676" radius={[0, 4, 4, 0]} name="Blocked" barSize={12}/>
+                  </BarChart>
+                </BResponsiveContainer>
+              </div>
             </div>
 
             {/* Recent queries */}

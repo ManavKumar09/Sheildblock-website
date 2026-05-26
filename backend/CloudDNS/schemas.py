@@ -22,6 +22,27 @@ class UserCreate(BaseModel):
 
         return value
 
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str = Field(min_length=8, max_length=128)
+
+    @field_validator("new_password")
+    @classmethod
+    def validate_password(cls, value: str):
+        if not any(c.isupper() for c in value):
+            raise ValueError("Password must contain an uppercase letter")
+
+        if not any(c.islower() for c in value):
+            raise ValueError("Password must contain a lowercase letter")
+
+        if not any(c.isdigit() for c in value):
+            raise ValueError("Password must contain a number")
+
+        return value
+
 class UserLogin(BaseModel):
     email: EmailStr
     password: str

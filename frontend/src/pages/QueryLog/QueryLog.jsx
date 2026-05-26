@@ -4,26 +4,7 @@ import DashboardTopBar from '../../components/DashboardTopBar/DashboardTopBar'
 import '../UserDashboard/UserDashboard.css'
 import './QueryLog.css'
 
-const queryLogEntries = [
-  { time: '14:59:59', domain: 'www.google-analytics.com',  type: 'A',     client: '192.168.1.15', response: '9.0ms',  status: 'blocked', blocklist: 'EasyList' },
-  { time: '14:52:46', domain: 'static.doubleclick.net',    type: 'A',     client: '192.168.1.100',response: '12.0ms', status: 'blocked', blocklist: 'AdGuard DNS' },
-  { time: '14:45:33', domain: 'connect.facebook.net',      type: 'AAAA',  client: '192.168.1.22', response: '15.0ms', status: 'allowed', blocklist: '-' },
-  { time: '14:38:20', domain: 'ads.google.com',            type: 'A',     client: '192.168.1.42', response: '15.6ms', status: 'blocked', blocklist: 'EasyList' },
-  { time: '14:31:07', domain: 'api.github.com',            type: 'CNAME', client: '192.168.1.8',  response: '8.5ms',  status: 'allowed', blocklist: '-' },
-  { time: '13:24:54', domain: 'fonts.googleapis.com',      type: 'AAAA',  client: '192.168.1.42', response: '15.7ms', status: 'allowed', blocklist: '-' },
-  { time: '13:18:41', domain: 'tracking.hubspot.com',      type: 'A',     client: '192.168.1.15', response: '11.2ms', status: 'blocked', blocklist: 'EasyPrivacy' },
-  { time: '13:12:28', domain: 'cdn.jsdelivr.net',          type: 'A',     client: '192.168.1.42', response: '6.3ms',  status: 'allowed', blocklist: '-' },
-  { time: '13:05:15', domain: 'pixel.facebook.com',        type: 'A',     client: '192.168.1.8',  response: '14.1ms', status: 'blocked', blocklist: 'AdGuard DNS' },
-  { time: '12:58:02', domain: 'vercel.com',                type: 'A',     client: '192.168.1.22', response: '5.8ms',  status: 'allowed', blocklist: '-' },
-  { time: '12:51:49', domain: 'telemetry.microsoft.com',   type: 'A',     client: '192.168.1.15', response: '18.3ms', status: 'blocked', blocklist: 'EasyPrivacy' },
-  { time: '12:44:36', domain: 'api.stripe.com',            type: 'A',     client: '192.168.1.42', response: '7.1ms',  status: 'allowed', blocklist: '-' },
-  { time: '12:37:23', domain: 'ads.yahoo.com',             type: 'A',     client: '192.168.1.8',  response: '13.4ms', status: 'blocked', blocklist: 'EasyList' },
-  { time: '12:30:10', domain: 'unpkg.com',                 type: 'A',     client: '192.168.1.22', response: '4.9ms',  status: 'allowed', blocklist: '-' },
-  { time: '12:22:57', domain: 'analytics.tiktok.com',      type: 'A',     client: '192.168.1.100',response: '16.8ms', status: 'blocked', blocklist: 'AdGuard DNS' },
-  { time: '12:15:44', domain: 'registry.npmjs.org',        type: 'A',     client: '192.168.1.42', response: '5.2ms',  status: 'allowed', blocklist: '-' },
-  { time: '12:08:31', domain: 'pixel.adsafeprotected.com', type: 'A',     client: '192.168.1.15', response: '14.7ms', status: 'blocked', blocklist: 'EasyList' },
-  { time: '12:01:18', domain: 'raw.githubusercontent.com', type: 'A',     client: '192.168.1.42', response: '6.0ms',  status: 'allowed', blocklist: '-' },
-]
+
 
 const navItems = [
   { id: 'overview',   label: 'Overview',   icon: (
@@ -63,18 +44,45 @@ export default function QueryLog() {
   const navigate = useNavigate()
   const [logFilter, setLogFilter] = useState('all')
   const [logSearch, setLogSearch] = useState('')
+  const [logs, setLogs] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
 
-  const filteredEntries = queryLogEntries.filter(entry => {
-    const matchesFilter = logFilter === 'all' || entry.status === logFilter
-    const matchesSearch = logSearch === '' ||
-      entry.domain.toLowerCase().includes(logSearch.toLowerCase()) ||
-      entry.client.toLowerCase().includes(logSearch.toLowerCase())
+  const fetchLogs = async () => {
+    try {
+      setIsLoading(true)
+      const token = localStorage.getItem('token')
+      // Fetch 7 days of historical logs
+      const res = await fetch('http://localhost:8000/api/dashboard/stats?days=7', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      const data = await res.json()
+      if (data && data.recent_logs) {
+        setLogs(data.recent_logs)
+      }
+    } catch (err) {
+      console.error("Error fetching logs:", err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchLogs()
+  }, [])
+
+  const filteredEntries = logs.filter(entry => {
+    const statusStr = entry.is_blocked ? 'blocked' : 'allowed'
+    const matchesFilter = logFilter === 'all' || statusStr === logFilter
+    
+    const searchLower = logSearch.toLowerCase()
+    const matchesSearch = logSearch === '' || entry.domain?.toLowerCase().includes(searchLower)
+    
     return matchesFilter && matchesSearch
   })
 
-  const totalQueries = queryLogEntries.length
-  const blockedCount = queryLogEntries.filter(e => e.status === 'blocked').length
-  const allowedCount = queryLogEntries.filter(e => e.status === 'allowed').length
+  const totalQueries = logs.length
+  const blockedCount = logs.filter(e => e.is_blocked).length
+  const allowedCount = logs.filter(e => !e.is_blocked).length
 
 
   const handleNav = (id) => {
@@ -139,7 +147,7 @@ export default function QueryLog() {
                 </svg>
                 Export
               </button>
-              <button className="ql__action-btn">
+              <button className="ql__action-btn" onClick={fetchLogs}>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
                   <polyline points="23 4 23 10 17 10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
                   <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
@@ -211,7 +219,19 @@ export default function QueryLog() {
                 </tr>
               </thead>
               <tbody>
-                {filteredEntries.map((entry, i) => (
+                {isLoading ? (
+                  <tr>
+                    <td colSpan="7" style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
+                      Loading historical logs...
+                    </td>
+                  </tr>
+                ) : filteredEntries.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
+                      No queries found matching the criteria.
+                    </td>
+                  </tr>
+                ) : filteredEntries.map((entry, i) => (
                   <tr key={i} className="ql__row">
                     <td>
                       <span className="ql__time">
@@ -219,19 +239,19 @@ export default function QueryLog() {
                           <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8"/>
                           <path d="M12 8v4l3 3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
                         </svg>
-                        {entry.time}
+                        {new Date(entry.timestamp).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                       </span>
                     </td>
                     <td><span className="ql__domain">{entry.domain}</span></td>
-                    <td><span className="ql__type">{entry.type}</span></td>
-                    <td><span className="ql__client">{entry.client}</span></td>
-                    <td><span className="ql__response">{entry.response}</span></td>
+                    <td><span className="ql__type">{entry.record_type}</span></td>
+                    <td><span className="ql__client">N/A</span></td>
+                    <td><span className="ql__response">{Number(entry.response_time_ms).toFixed(1)}ms</span></td>
                     <td>
-                      <span className={`ql__status ${entry.status === 'blocked' ? 'ql__status--blocked' : 'ql__status--allowed'}`}>
-                        {entry.status}
+                      <span className={`ql__status ${entry.is_blocked ? 'ql__status--blocked' : 'ql__status--allowed'}`}>
+                        {entry.is_blocked ? 'blocked' : 'allowed'}
                       </span>
                     </td>
-                    <td><span className="ql__blocklist">{entry.blocklist}</span></td>
+                    <td><span className="ql__blocklist">{entry.blocklist_name || '-'}</span></td>
                   </tr>
                 ))}
               </tbody>

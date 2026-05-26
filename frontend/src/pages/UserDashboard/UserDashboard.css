@@ -377,7 +377,7 @@
 
 .udash__query-row {
   display: grid;
-  grid-template-columns: 10px 65px 1fr 100px 65px;
+  grid-template-columns: 10px 85px 1fr 100px 65px;
   align-items: center;
   gap: 0.75rem;
   padding: 0.6rem 0;
@@ -406,6 +406,7 @@
   font-size: 0.72rem;
   color: var(--text-muted);
   font-family: monospace;
+  white-space: nowrap;
 }
 
 .udash__query-domain {

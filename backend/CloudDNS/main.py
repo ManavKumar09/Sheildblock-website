@@ -15,7 +15,7 @@ from db import SessionLocal, engine, Base, get_db
 import models
 import schemas
 import users
-from email_utils import create_verification_token, send_verification_email, decode_verification_token, create_access_token
+from email_utils import create_verification_token, send_verification_email, decode_verification_token, create_access_token, create_reset_token, send_password_reset_email, decode_reset_token
 import analytics
 import redis.asyncio as aioredis
 import json
@@ -147,6 +147,32 @@ async def login(request: Request, user_credentials: schemas.UserLogin, db: Sessi
     
     return {"access_token": access_token, "token_type": "bearer"}
 
+@app.post("/forgot-password")
+async def forgot_password(request: schemas.ForgotPasswordRequest, db: Session = Depends(get_db), background_tasks: BackgroundTasks = None):
+    user = users.get_user_by_email(db, email=request.email)
+    # Always return the same message to prevent email enumeration
+    message = "If an account with that email exists, a password reset link has been sent."
+    if user:
+        token = create_reset_token(user.email)
+        if background_tasks:
+            background_tasks.add_task(send_password_reset_email, user.email, token)
+        else:
+            asyncio.create_task(send_password_reset_email(user.email, token))
+    return {"message": message}
+
+@app.post("/reset-password")
+async def reset_password(request: schemas.ResetPasswordRequest, db: Session = Depends(get_db)):
+    email = decode_reset_token(request.token)
+    if not email:
+        raise HTTPException(status_code=400, detail="Invalid or expired reset token")
+        
+    user = users.get_user_by_email(db, email=email)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+        
+    users.update_password(db, user, request.new_password)
+    return {"message": "Password successfully reset. You can now log in."}
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
 
 def get_current_user_id(token: str = Depends(oauth2_scheme)):
@@ -203,26 +229,54 @@ async def create_cloud_config(
     
     return response_data
 
-@app.get("/api/dashboard/stats")
-async def get_dashboard_stats(
+@app.get("/api/user/me")
+async def get_user_me(
     user_id: str = Depends(get_current_user_id),
     db: Session = Depends(get_db)
 ):
     user = db.query(models.User).filter(models.User.id == user_id).first()
-    if not user or not user.config_hash:
-        raise HTTPException(status_code=400, detail="No DNS configuration found for this user.")
-        
-    config_hash = user.config_hash
-    # config_hash = "a1b2c3d4e5f678901234567890123456789012345678901234567890abcd"
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
     
     return {
-        "summary": analytics.get_dashboard_summary(config_hash),
-        "top_blocked": analytics.get_top_domains(config_hash, is_blocked=True, limit=10),
-        "top_allowed": analytics.get_top_domains(config_hash, is_blocked=False, limit=10),
-        "chart_data": analytics.get_queries_over_time(config_hash),
-        "query_types": analytics.get_query_types_distribution(config_hash),
-        "recent_logs": analytics.get_recent_logs(config_hash, limit=50)
+        "id": user.id,
+        "name": user.name,
+        "email": user.email,
+        "config_hash": user.config_hash
     }
+
+@app.get("/api/dashboard/stats")
+async def get_dashboard_stats(
+    days: int = 1,
+    user_id: str = Depends(get_current_user_id),
+    db: Session = Depends(get_db)
+):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    # if not user or not user.config_hash:
+    #     raise HTTPException(status_code=400, detail="No DNS configuration found for this user.")
+        
+    # fallback to dummy hash for testing
+    # config_hash = user.config_hash if user and user.config_hash else "e65d37dc1b5c8b1004572835aed998679e1cb8b285200796954114b92bcd"
+    config_hash = user.config_hash
+    
+    return {
+        "summary": analytics.get_dashboard_summary(config_hash, days=days),
+        "top_blocked": analytics.get_top_domains(config_hash, is_blocked=True, limit=10, days=days),
+        "top_allowed": analytics.get_top_domains(config_hash, is_blocked=False, limit=10, days=days),
+        "chart_data": analytics.get_queries_over_time(config_hash, days=days),
+        "query_types": analytics.get_query_types_distribution(config_hash, days=days),
+        "recent_logs": analytics.get_recent_logs(config_hash, limit=1000, days=days)
+    }
+
+@app.get("/api/domains")
+async def get_domains(
+    days: int = 7,
+    user_id: str = Depends(get_current_user_id),
+    db: Session = Depends(get_db)
+):
+    user = db.query(models.User).filter(models.User.id == user_id).first()
+    config_hash = user.config_hash
+    return analytics.get_all_domains_stats(config_hash, days=days)
 
 # The channel name where the DNS server will publish
 DNS_LOGS_CHANNEL = "live_dns_logs"

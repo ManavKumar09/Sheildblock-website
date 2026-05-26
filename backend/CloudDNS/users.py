@@ -60,6 +60,18 @@ def create_user(db: Session, user: UserCreate):
         logger.error(f"Failed to create user: {str(e)}")
         raise
 
+def update_password(db: Session, user: User, new_password: str):
+    try:
+        hashed_password = get_password_hash(new_password)
+        user.hashed_password = hashed_password
+        db.commit()
+        db.refresh(user)
+        return user
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Failed to update password: {str(e)}")
+        raise
+
 
 def verify_user(db: Session, email: str):
     try:

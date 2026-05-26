@@ -21,6 +21,8 @@ import Onboarding from './pages/OnBoarding/OnBoarding'
 import Settings from './pages/Settings/Settings'
 import Verify from './pages/Verify/Verify'
 import DeviceGuide from './pages/OnBoarding/DeviceGuide'
+import ForgotPassword from './pages/signup/ForgotPassword'
+import ResetPassword from './pages/signup/ResetPassword'
 
 function HomePage() {
   return (
@@ -49,6 +51,8 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/signup" element={<Signup />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/dashboard" element={<UserDashboard />} />
         <Route path="/dashboard/queries" element={<QueryLog />} />
         <Route path="/dashboard/blocklists" element={<Blocklists />} />

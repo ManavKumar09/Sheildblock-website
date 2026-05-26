@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import DashboardTopBar from '../../components/DashboardTopBar/DashboardTopBar'
 import ReportModal from '../../components/ReportModal/ReportModal'
@@ -62,8 +62,30 @@ export default function Settings() {
   const [copiedDoh, setCopiedDoh] = useState(false)
   const [copiedDot, setCopiedDot] = useState(false)
 
-  const dohLink = 'https://dns.shieldblock.org/dummy-profile/dns-query'
-  const dotLink = 'dns.shieldblock.org/dummy-profile'
+  const [dohLink, setDohLink] = useState('https://dns.shieldblock.in/dummy-profile/dns-query')
+  const [dotLink, setDotLink] = useState('dns.shieldblock.in/dummy-profile')
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const token = localStorage.getItem('token')
+        if (!token) return
+        const response = await fetch('http://localhost:8000/api/user/me', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+        if (response.ok) {
+          const data = await response.json()
+          if (data.config_hash) {
+            setDohLink(`https://${data.config_hash}.dns.shieldblock.in/dns-query`)
+            setDotLink(`${data.config_hash}.dns.shieldblock.in`)
+          }
+        }
+      } catch (e) {
+        console.error('Failed to fetch user profile:', e)
+      }
+    }
+    fetchUser()
+  }, [])
 
   const copyToClipboard = (text, type) => {
     navigator.clipboard.writeText(text)
