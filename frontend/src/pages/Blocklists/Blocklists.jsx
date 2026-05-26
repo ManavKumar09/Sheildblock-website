@@ -253,13 +253,15 @@ export default function Blocklists() {
           <div className="bl__list">
             {filteredLists.map(list => (
               <div key={list.id} className={`bl__item ${list.enabled ? 'bl__item--enabled' : ''}`}>
-                <button
-                  className={`bl__toggle ${list.enabled ? 'bl__toggle--on' : ''}`}
-                  onClick={() => toggleList(list.id)}
-                  aria-label={`Toggle ${list.name}`}
-                >
-                  <span className="bl__toggle-knob" />
-                </button>
+                {activeCategory === 'All' && (
+                  <button
+                    className={`bl__toggle ${list.enabled ? 'bl__toggle--on' : ''}`}
+                    onClick={() => toggleList(list.id)}
+                    aria-label={`Toggle ${list.name}`}
+                  >
+                    <span className="bl__toggle-knob" />
+                  </button>
+                )}
 
                 <div className="bl__item-info">
                   <div className="bl__item-name-row">

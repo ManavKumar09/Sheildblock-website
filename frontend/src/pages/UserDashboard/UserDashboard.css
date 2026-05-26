@@ -263,6 +263,7 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  min-width: 0; /* Prevents flex/grid blowout with Recharts */
 }
 
 .udash__chart-header {
@@ -764,19 +765,32 @@
 }
 
 /* Responsive */
-@media (max-width: 1100px) {
-  .udash__stats { grid-template-columns: 1fr 1fr; }
-  .udash__charts-row { grid-template-columns: 1fr; }
-  .udash__bottom-row { grid-template-columns: 1fr; }
-  .udash__querylog-toolbar { flex-direction: column; align-items: stretch; }
-  .udash__querylog-stats { grid-template-columns: 1fr 1fr 1fr; }
+@media (max-width: 1400px) {
+  .udash__stats { grid-template-columns: repeat(2, 1fr); }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 1200px) {
+  .udash__charts-row { grid-template-columns: 1fr; }
+  .udash__bottom-row { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 900px) {
+  .udash__querylog-toolbar { flex-direction: column; align-items: stretch; }
+  .udash__querylog-stats { grid-template-columns: repeat(2, 1fr); }
+  .udash__content { padding: 1.5rem; }
+}
+
+@media (max-width: 768px) {
   .udash { grid-template-columns: 1fr; }
   .udash__sidebar { display: none; }
-  .udash__stats { grid-template-columns: 1fr 1fr; }
+  .udash__topbar { padding: 1rem 1.5rem; }
+}
+
+@media (max-width: 550px) {
+  .udash__stats { grid-template-columns: 1fr; }
   .udash__querylog-stats { grid-template-columns: 1fr; }
   .udash__querylog-header { flex-direction: column; gap: 0.75rem; }
   .udash__querylog-filters { flex-wrap: wrap; }
+  .udash__content { padding: 1rem; }
+  .udash__chart-card { padding: 1rem; }
 }

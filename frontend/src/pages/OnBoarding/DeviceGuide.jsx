@@ -31,18 +31,18 @@ export default function DeviceGuide() {
           </div>
 
           {deviceName.toLowerCase() === 'android' ? (
-            <div className="dguide__steps-images" style={{ display: 'flex', flexDirection: 'column', gap: '2rem', marginTop: '1rem' }}>
-              <div className="dguide__step-img">
-                <img src={android1} alt="Android Step 1" style={{ width: '100%', maxWidth: '400px', borderRadius: '16px', border: '1px solid var(--border-subtle)', display: 'block', margin: '0 auto' }} />
+            <div className="dguide__steps-images">
+              <div className="dguide__step-img" data-step="1">
+                <img src={android1} alt="Android Step 1" />
               </div>
-              <div className="dguide__step-img">
-                <img src={android2} alt="Android Step 2" style={{ width: '100%', maxWidth: '400px', borderRadius: '16px', border: '1px solid var(--border-subtle)', display: 'block', margin: '0 auto' }} />
+              <div className="dguide__step-img" data-step="2">
+                <img src={android2} alt="Android Step 2" />
               </div>
-              <div className="dguide__step-img">
-                <img src={android3} alt="Android Step 3" style={{ width: '100%', maxWidth: '400px', borderRadius: '16px', border: '1px solid var(--border-subtle)', display: 'block', margin: '0 auto' }} />
+              <div className="dguide__step-img" data-step="3">
+                <img src={android3} alt="Android Step 3" />
               </div>
-              <div className="dguide__step-img">
-                <img src={android4} alt="Android Step 4" style={{ width: '100%', maxWidth: '400px', borderRadius: '16px', border: '1px solid var(--border-subtle)', display: 'block', margin: '0 auto' }} />
+              <div className="dguide__step-img" data-step="4">
+                <img src={android4} alt="Android Step 4" />
               </div>
             </div>
           ) : (

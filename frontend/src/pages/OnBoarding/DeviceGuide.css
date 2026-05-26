@@ -144,3 +144,70 @@
 .dguide__card strong {
   color: var(--green);
 }
+
+.dguide__steps-images {
+  display: flex;
+  overflow-x: auto;
+  gap: 1.5rem;
+  padding: 1rem 0 2rem 0;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  /* Ensure container takes full width available minus some padding if needed */
+  width: 100%;
+}
+
+/* Hide scrollbar for a cleaner look */
+.dguide__steps-images::-webkit-scrollbar {
+  height: 8px;
+}
+.dguide__steps-images::-webkit-scrollbar-track {
+  background: var(--bg-card); 
+  border-radius: 4px;
+}
+.dguide__steps-images::-webkit-scrollbar-thumb {
+  background: var(--border); 
+  border-radius: 4px;
+}
+.dguide__steps-images::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary); 
+}
+
+.dguide__step-img {
+  flex: 0 0 auto;
+  width: 280px; 
+  scroll-snap-align: center;
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 16px;
+}
+
+.dguide__step-img:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+}
+
+.dguide__step-img img {
+  width: 100%;
+  border-radius: 16px;
+  border: 1px solid var(--border-subtle);
+  display: block;
+}
+
+/* Add Step Numbers Overlay */
+.dguide__step-img::after {
+  content: attr(data-step);
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: var(--green);
+  color: #000;
+  font-weight: 700;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  box-shadow: 0 4px 10px rgba(0, 230, 118, 0.3);
+}
