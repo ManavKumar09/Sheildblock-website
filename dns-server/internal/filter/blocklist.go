@@ -1,7 +1,12 @@
 package filter
 
 import (
+	"bufio"
+	"log"
+	"os"
+	"strings"
 	"sync"
+	"time"
 )
 
 // Define your categories as powers of 2 (Bits)
@@ -25,7 +30,6 @@ type Blocklist struct {
 	categories []Category
 	mu         sync.RWMutex
 }
-
 
 func NewBlocklist(dataDir string) *Blocklist {
 	bl := &Blocklist{
@@ -105,6 +109,14 @@ func loadListFromFile(filepath string) (map[string]struct{}, error) {
 }
 
 // Check evaluates the domain against the user's specific bitmask policy.
+// It walks up the domain hierarchy for wildcard-style matching:
+//
+//	"www.m.facebook.com." → "m.facebook.com." → "facebook.com."
+//
+// This is necessary because some HaGeZi lists (social, NSFW, fake, etc.)
+// only contain root domains, expecting the DNS tool to match all subdomains.
+// The domains/ format lists include explicit subdomain entries (www., m., etc.),
+// but the wildcard/-onlydomains format does not.
 func (bl *Blocklist) Check(domain string, userPolicy uint32) (bool, string) {
 	bl.mu.RLock()
 	defer bl.mu.RUnlock()
@@ -114,9 +126,19 @@ func (bl *Blocklist) Check(domain string, userPolicy uint32) (bool, string) {
 	for _, cat := range bl.categories {
 		// If the user's policy includes this category's bit
 		if (userPolicy & cat.Bitmask) != 0 {
-			// Check if the domain exists in the zero-byte map
-			if _, exists := cat.Domains[domain]; exists {
-				return true, cat.Name
+			// Walk up the domain hierarchy:
+			// "www.facebook.com." → "facebook.com." → "com."
+			// Typically 3-4 map lookups per category (O(label_count)).
+			for check := domain; check != ""; {
+				if _, exists := cat.Domains[check]; exists {
+					return true, cat.Name
+				}
+				// Strip the leftmost label: "www.facebook.com." → "facebook.com."
+				dot := strings.IndexByte(check, '.')
+				if dot == -1 || dot+1 >= len(check) {
+					break
+				}
+				check = check[dot+1:]
 			}
 		}
 	}

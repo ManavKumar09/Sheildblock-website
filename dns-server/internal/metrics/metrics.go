@@ -17,10 +17,29 @@ type Counters struct {
 
 var Global Counters
 
+// ReadyCheck is set by main after dependencies are initialized.
+// It should return nil if all external deps (Valkey, ClickHouse) are healthy.
+var ReadyCheck func() error
+
 func StartServer(addr string) {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("OK"))
+	})
+
+	mux.HandleFunc("/readyz", func(w http.ResponseWriter, r *http.Request) {
+		if ReadyCheck == nil {
+			w.WriteHeader(http.StatusServiceUnavailable)
+			w.Write([]byte("readiness check not configured"))
+			return
+		}
+		if err := ReadyCheck(); err != nil {
+			w.WriteHeader(http.StatusServiceUnavailable)
+			w.Write([]byte(err.Error()))
+			return
+		}
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("OK"))
 	})

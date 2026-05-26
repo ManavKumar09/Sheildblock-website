@@ -1,8 +1,10 @@
 package main
 
 import (
+	"context"
 	"crypto/tls"
 	"flag"
+	"fmt"
 	"log"
 	"time"
 
@@ -21,6 +23,7 @@ func main() {
 	keyFile := flag.String("tls-key", "/etc/letsencrypt/live/dns.shieldblock.in/privkey.pem", "Path to the TLS private key")
 	valkeyAddr := flag.String("valkey-addr", "127.0.0.1:6379", "Valkey server address")
 	chAddr := flag.String("clickhouse-addr", "172.31.43.17:9000", "Clickhouse server address")
+	dataDir := flag.String("data-dir", "/opt/shieldblock/data", "Path to the data directory")
 	flag.Parse()
 
 	// 1. Init Metrics Server
@@ -51,9 +54,20 @@ func main() {
 	authDB := auth.NewDB(valkeyClient)
 	authCache := auth.NewCache(authDB, 5*time.Minute)
 	analyticsDB := analytics.NewDB(chConn)
-	blocklist := filter.NewBlocklist()
+	blocklist := filter.NewBlocklist(*dataDir)
 
-	server := dns.NewServer(authCache, analyticsDB, blocklist, "1.1.1.1:853")
+	// 5. Wire Readiness Check (Valkey + ClickHouse health)
+	metrics.ReadyCheck = func() error {
+		if err := valkeyClient.Do(context.Background(), valkeyClient.B().Ping().Build()).Error(); err != nil {
+			return fmt.Errorf("valkey: %w", err)
+		}
+		if err := chConn.Ping(context.Background()); err != nil {
+			return fmt.Errorf("clickhouse: %w", err)
+		}
+		return nil
+	}
+
+	server := dns.NewServer(authCache, analyticsDB, blocklist, "1.1.1.1:853", valkeyClient)
 
 	// 5. Start DoT Listener
 	cert, err := tls.LoadX509KeyPair(*certFile, *keyFile)
