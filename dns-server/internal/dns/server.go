@@ -81,31 +81,35 @@ func (s *Server) putUpstreamConn(c *dns.Conn) {
 }
 
 func (s *Server) exchangeUpstream(msg *dns.Msg) (*dns.Msg, error) {
-	conn, err := s.getUpstreamConn()
-	if err != nil {
-		return nil, err
+	for i := 0; i < 3; i++ { // Try up to 3 times to account for multiple stale connections
+		conn, err := s.getUpstreamConn()
+		if err != nil {
+			return nil, err
+		}
+
+		conn.SetDeadline(time.Now().Add(upstreamTimeout))
+
+		if err := conn.WriteMsg(msg); err != nil {
+			conn.Close()
+			continue // connection likely closed by upstream, retry
+		}
+
+		resp, err := conn.ReadMsg()
+		if err != nil {
+			conn.Close()
+			continue // connection likely closed by upstream, retry
+		}
+
+		if resp.Id != msg.Id {
+			conn.Close()
+			return nil, fmt.Errorf("upstream response ID mismatch: sent %d, got %d", msg.Id, resp.Id)
+		}
+
+		s.putUpstreamConn(conn)
+		return resp, nil
 	}
 
-	conn.SetDeadline(time.Now().Add(upstreamTimeout))
-
-	if err := conn.WriteMsg(msg); err != nil {
-		conn.Close()
-		return nil, err
-	}
-
-	resp, err := conn.ReadMsg()
-	if err != nil {
-		conn.Close()
-		return nil, err
-	}
-
-	if resp.Id != msg.Id {
-		conn.Close()
-		return nil, fmt.Errorf("upstream response ID mismatch: sent %d, got %d", msg.Id, resp.Id)
-	}
-
-	s.putUpstreamConn(conn)
-	return resp, nil
+	return nil, fmt.Errorf("upstream request failed after retries")
 }
 
 // ── Bounded Valkey Publisher ──
